@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 
 
 app.get('/', (req, res) => {
-    res.status(200).send('index');
+    res.sendFile(path.join(__dirname + 'src/views/index.html'));
 });
 
 
