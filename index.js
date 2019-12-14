@@ -1,4 +1,5 @@
 var path = require('path');
+var cookieParser = require('cookie-parser');
 var express = require('express');
 var app = express();
 
