@@ -7,108 +7,115 @@
   <body>
     <h1>Draw a digit below !</h1>
     <canvas id="c" height="400" width="300"></canvas>
-    <button id="predict">Predict</button>
+    <div id="image" style="visibility: none;"></div>
+    <button id="predict" onclick="predict()">Predict</button>
     <script>
-      (function() {
-        var $ = function(id) {
-          return document.getElementById(id);
+      var canvas = (this.__canvas = new fabric.Canvas("c", {
+        isDrawingMode: true
+      }));
+
+      canvas.backgroundColor="white";
+
+      function predict() {
+        console.log(
+          canvas.toDataURL({
+            format: "jpeg"
+          })
+        );
+      }
+
+      var $ = function(id) {
+        return document.getElementById(id);
+      };
+
+      fabric.Object.prototype.transparentCorners = false;
+
+      var drawingModeEl = $("drawing-mode"),
+        drawingOptionsEl = $("drawing-mode-options"),
+        drawingColorEl = $("drawing-color"),
+        drawingShadowColorEl = $("drawing-shadow-color"),
+        drawingLineWidthEl = $("drawing-line-width"),
+        drawingShadowWidth = $("drawing-shadow-width"),
+        drawingShadowOffset = $("drawing-shadow-offset"),
+        clearEl = $("clear-canvas");
+
+      if (fabric.PatternBrush) {
+        var vLinePatternBrush = new fabric.PatternBrush(canvas);
+        vLinePatternBrush.getPatternSrc = function() {
+          var patternCanvas = fabric.document.createElement("canvas");
+          patternCanvas.width = patternCanvas.height = 300;
+          var ctx = patternCanvas.getContext("2d");
+
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(0, 5);
+          ctx.lineTo(10, 5);
+          ctx.closePath();
+          ctx.stroke();
+
+          return patternCanvas;
         };
 
-        var canvas = (this.__canvas = new fabric.Canvas("c", {
-          isDrawingMode: true
-        }));
+        var hLinePatternBrush = new fabric.PatternBrush(canvas);
+        hLinePatternBrush.getPatternSrc = function() {
+          var patternCanvas = fabric.document.createElement("canvas");
+          patternCanvas.width = patternCanvas.height = 10;
+          var ctx = patternCanvas.getContext("2d");
 
-        fabric.Object.prototype.transparentCorners = false;
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(5, 0);
+          ctx.lineTo(5, 10);
+          ctx.closePath();
+          ctx.stroke();
 
-        var drawingModeEl = $("drawing-mode"),
-          drawingOptionsEl = $("drawing-mode-options"),
-          drawingColorEl = $("drawing-color"),
-          drawingShadowColorEl = $("drawing-shadow-color"),
-          drawingLineWidthEl = $("drawing-line-width"),
-          drawingShadowWidth = $("drawing-shadow-width"),
-          drawingShadowOffset = $("drawing-shadow-offset"),
-          clearEl = $("clear-canvas");
+          return patternCanvas;
+        };
 
-        if (fabric.PatternBrush) {
-          var vLinePatternBrush = new fabric.PatternBrush(canvas);
-          vLinePatternBrush.getPatternSrc = function() {
-            var patternCanvas = fabric.document.createElement("canvas");
-            patternCanvas.width = patternCanvas.height = 300;
-            var ctx = patternCanvas.getContext("2d");
+        var squarePatternBrush = new fabric.PatternBrush(canvas);
+        squarePatternBrush.getPatternSrc = function() {
+          var squareWidth = 10,
+            squareDistance = 2;
 
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = 5;
-            ctx.beginPath();
-            ctx.moveTo(0, 5);
-            ctx.lineTo(10, 5);
-            ctx.closePath();
-            ctx.stroke();
+          var patternCanvas = fabric.document.createElement("canvas");
+          patternCanvas.width = patternCanvas.height =
+            squareWidth + squareDistance;
+          var ctx = patternCanvas.getContext("2d");
 
-            return patternCanvas;
-          };
+          ctx.fillStyle = this.color;
+          ctx.fillRect(0, 0, squareWidth, squareWidth);
 
-          var hLinePatternBrush = new fabric.PatternBrush(canvas);
-          hLinePatternBrush.getPatternSrc = function() {
-            var patternCanvas = fabric.document.createElement("canvas");
-            patternCanvas.width = patternCanvas.height = 10;
-            var ctx = patternCanvas.getContext("2d");
+          return patternCanvas;
+        };
 
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = 5;
-            ctx.beginPath();
-            ctx.moveTo(5, 0);
-            ctx.lineTo(5, 10);
-            ctx.closePath();
-            ctx.stroke();
+        var diamondPatternBrush = new fabric.PatternBrush(canvas);
+        diamondPatternBrush.getPatternSrc = function() {
+          var squareWidth = 10,
+            squareDistance = 5;
+          var patternCanvas = fabric.document.createElement("canvas");
+          var rect = new fabric.Rect({
+            width: squareWidth,
+            height: squareWidth,
+            angle: 45,
+            fill: this.color
+          });
 
-            return patternCanvas;
-          };
+          var canvasWidth = rect.getBoundingRect().width;
 
-          var squarePatternBrush = new fabric.PatternBrush(canvas);
-          squarePatternBrush.getPatternSrc = function() {
-            var squareWidth = 10,
-              squareDistance = 2;
+          patternCanvas.width = patternCanvas.height =
+            canvasWidth + squareDistance;
+          rect.set({ left: canvasWidth / 2, top: canvasWidth / 2 });
 
-            var patternCanvas = fabric.document.createElement("canvas");
-            patternCanvas.width = patternCanvas.height =
-              squareWidth + squareDistance;
-            var ctx = patternCanvas.getContext("2d");
+          var ctx = patternCanvas.getContext("2d");
+          rect.render(ctx);
 
-            ctx.fillStyle = this.color;
-            ctx.fillRect(0, 0, squareWidth, squareWidth);
+          return patternCanvas;
+        };
 
-            return patternCanvas;
-          };
-
-          var diamondPatternBrush = new fabric.PatternBrush(canvas);
-          diamondPatternBrush.getPatternSrc = function() {
-            var squareWidth = 10,
-              squareDistance = 5;
-            var patternCanvas = fabric.document.createElement("canvas");
-            var rect = new fabric.Rect({
-              width: squareWidth,
-              height: squareWidth,
-              angle: 45,
-              fill: this.color
-            });
-
-            var canvasWidth = rect.getBoundingRect().width;
-
-            patternCanvas.width = patternCanvas.height =
-              canvasWidth + squareDistance;
-            rect.set({ left: canvasWidth / 2, top: canvasWidth / 2 });
-
-            var ctx = patternCanvas.getContext("2d");
-            rect.render(ctx);
-
-            return patternCanvas;
-          };
-
-          var texturePatternBrush = new fabric.PatternBrush(canvas);
-        }
-
-    
-      })();
+        var texturePatternBrush = new fabric.PatternBrush(canvas);
+      }
     </script>
   </body>
 </html>
