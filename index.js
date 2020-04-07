@@ -14,9 +14,24 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/src/views/index.html'));
+    res.send(JSON.stringify(
+        [
+            {
+                "name": "batman",
+                "superpower": "money"
+            },
+            {
+                "name": "catwoman",
+                "superpower": "agility"
+            },
+            {
+                "name": "kungfu panda",
+                "superpower": "double kick"
+            }
+        ]
+    ))
 });
 
 
 
-app.listen(PORT, () => {});
+app.listen(PORT, () => { });
