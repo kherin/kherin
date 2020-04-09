@@ -13,25 +13,53 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'src/public')));
 
 
-app.get('/', (req, res) => {
-    res.send(JSON.stringify(
-        [
-            {
-                "name": "batman",
-                "superpower": "money"
-            },
-            {
-                "name": "catwoman",
-                "superpower": "agility"
-            },
-            {
-                "name": "kungfu panda",
-                "superpower": "double kick"
-            }
-        ]
-    ))
+app.get('/coronavirus', (req, res) => {
+    res.send(
+        JSON.stringify(
+            [
+                {
+                    "date": "01 April",
+                    "count": 100
+                },
+                {
+                    "date": "02 April",
+                    "count": 140
+                },
+                {
+                    "date": "03 April",
+                    "count": 150
+                },
+                {
+                    "date": "04 April",
+                    "count": 191
+                },
+                {
+                    "date": "05 April",
+                    "count": 201
+                },
+                {
+                    "date": "06 April",
+                    "count": 231
+                },
+                {
+                    "date": "07 April",
+                    "count": 245
+                },
+                {
+                    "date": "08 April",
+                    "count": 267
+                },
+                {
+                    "date": "09 April",
+                    "count": 281
+                },
+                {
+                    "date": "10 April",
+                    "count": 302
+                },
+            ]
+        )
+    );
 });
-
-
 
 app.listen(PORT, () => { });
