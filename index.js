@@ -1,14 +1,14 @@
-var express = require("express");
-var app = express();
+const express = require("express");
+const app = express();
+const path = require("path");
 
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
 app.get("/", (_, res) => {
-  res.status(200);
-  res.send({
-    foo: "bar",
-  });
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(PORT, () => {
