@@ -32,14 +32,14 @@ const LandingSection = () => {
       submit("http://example.com", values);
     },
     validationSchema: Yup.object({
-      firstName: Yup.string().required("Your first name is required!"),
-      email: Yup.string().required("Your email is required!"),
+      firstName: Yup.string().required("Required"),
+      email: Yup.string().email("Invalid email address").required("Required"),
       type: Yup.array().oneOf([
         "Freelance project proposal",
         "Open source consultancy session",
         "Other",
       ]),
-      comment: Yup.string().required("Comment is required!"),
+      comment: Yup.string().min(25).required("Required"),
     }),
   });
 
@@ -109,7 +109,12 @@ const LandingSection = () => {
                 />
                 <FormErrorMessage>{formik.errors.comment}</FormErrorMessage>
               </FormControl>
-              <Button type="submit" colorScheme="purple" width="full">
+              <Button
+                type="submit"
+                colorScheme="purple"
+                width="full"
+                isLoading={isLoading}
+              >
                 Submit
               </Button>
             </VStack>

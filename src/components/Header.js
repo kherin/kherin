@@ -91,13 +91,9 @@ const Header = () => {
           <nav>
             <HStack spacing={8}>
               {socials.map((social) => (
-                <Box
-                  key={social.url}
-                  cursor="pointer"
-                  onClick={handleClick(social.url)}
-                >
+                <a key={social.url} href={social.url} target="_blank">
                   <FontAwesomeIcon icon={social.icon} size="2x" />
-                </Box>
+                </a>
               ))}
             </HStack>
           </nav>
