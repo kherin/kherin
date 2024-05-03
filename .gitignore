@@ -1,0 +1,25 @@
+# Virtual environment
+venv/
+
+# IDE and editor files
+.idea/
+.vscode/
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Django-specific files
+*.log
+db.sqlite3
+
+# Static and media files
+staticfiles/
+media/
+
+# Configuration files
+*.env
+
+# Dependency directories
+lib/
+lib64/
