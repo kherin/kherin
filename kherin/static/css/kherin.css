@@ -1,0 +1,13 @@
+.underline-gradient {
+    position: relative;
+    width: 100%;
+    background-color: #fff;
+}
+
+.underline-gradient::after {
+    content: "";
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(to right, transparent, #3970d7ce, transparent);
+}

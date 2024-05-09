@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Banner Image -->
+    {% image page.banner_image original as banner_image %}
+    <img class="h-64 w-full object-cover mb-6" src="{{ banner_image.url }}" alt="{{ page.heading }}">
+
+    <!-- Post Heading -->
+    <div class="mb-4">
+        <span class="text-sm text-gray-600">{{ page.post_date }}</span>
+        <h1 class="font-bold text-3xl text-gray-900">{{ page.heading }}</h1>
+    </div>
+
+    <!-- Post Excerpt -->
+    <h2 class="font-semibold text-xl text-gray-800 leading-tight mb-4">{{ page.excerpt }}</h2>
+
+    <!-- Post Body -->
+    <div class="prose max-w-none">
+        {{ page.body|richtext }}
+    </div>
+</div>
+
+{% endblock content %}

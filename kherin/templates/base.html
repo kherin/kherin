@@ -1,0 +1,76 @@
+{% load static wagtailcore_tags wagtailuserbar %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>
+        {% block title %}
+        {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
+        {% endblock %}
+        {% block title_suffix %}
+        {% wagtail_site as current_site %}
+        {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
+        {% endblock %}
+    </title>
+    {% if page.search_description %}
+    <meta name="description" content="{{ page.search_description }}" />
+    {% endif %}
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {# Force all links in the live preview panel to be opened in a new tab #}
+    {% if request.in_preview_panel %}
+    <base target="_blank">
+    {% endif %}
+
+    {# Global stylesheets #}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/kherin.css' %}">
+
+    {% block extra_css %}
+    {# Override this in templates to add extra stylesheets #}
+    {% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %} h-screen">
+    {% wagtailuserbar %}
+
+    <!-- START NAVBAR -->
+    <nav class="bg-white border-gray-200 dark:bg-gray-900">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto py-4">
+            <a href="/" class="flex items-center rtl:space-x-reverse">
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">kherin.com</span>
+            </a>
+            <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+                <ul
+                    class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li>
+                        <a href="/"
+                            class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
+                            aria-current="page">Home</a>
+                    </li>
+                    <li>
+                        <a href="mailto:kherin.j.s.bundhoo@gmail.com"
+                            class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="underline-gradient"></div>
+    </nav>
+    <!-- END NAVBAR -->
+
+    <!-- BASE CONTENT -->
+    {% block content %}{% endblock %}
+    <!-- END BASE CONTENT -->
+    {# Global javascript #}
+    <script type="text/javascript" src="{% static 'js/kherin.js' %}"></script>
+
+    {% block extra_js %}
+    {# Override this in templates to add extra javascript #}
+    {% endblock %}
+</body>
+
+</html>
