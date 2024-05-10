@@ -43,6 +43,9 @@
             <a href="/" class="flex items-center rtl:space-x-reverse">
                 <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">kherin.com</span>
             </a>
+            <button class="md:hidden" id="menu-button">
+                <span>Menu</span>
+            </button>
             <div class="hidden w-full md:block md:w-auto" id="navbar-default">
                 <ul
                     class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
@@ -60,6 +63,7 @@
         </div>
         <div class="underline-gradient"></div>
     </nav>
+
     <!-- END NAVBAR -->
 
     <!-- BASE CONTENT -->
@@ -67,6 +71,16 @@
     <!-- END BASE CONTENT -->
     {# Global javascript #}
     <script type="text/javascript" src="{% static 'js/kherin.js' %}"></script>
+    <script>
+        document.getElementById('menu-button').addEventListener('click', function () {
+            var navbar = document.getElementById('navbar-default');
+            if (navbar.style.display === 'none') {
+                navbar.style.display = 'block';
+            } else {
+                navbar.style.display = 'none';
+            }
+        });
+    </script>
 
     {% block extra_js %}
     {# Override this in templates to add extra javascript #}
