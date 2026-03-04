@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts
+  .sort((a, b) => new Date(b.data.publishedAt).valueOf() - new Date(a.data.publishedAt).valueOf())
+  .slice(0, 3);
+---
+
+<section id="blog-preview" class="py-24 px-6 bg-f1-dark border-y border-f1-border" aria-labelledby="blog-heading">
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal flex items-end justify-between mb-12 flex-wrap gap-4">
+      <div>
+        <div class="sector-label mb-3">Race Reports</div>
+        <h2 id="blog-heading" class="display text-5xl md:text-6xl text-f1-white">
+          LATEST<br/><span class="text-f1-red">POSTS</span>
+        </h2>
+      </div>
+      <a href="/blog" class="btn-f1 btn-f1-ghost flex items-center gap-2">
+        All Posts
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    {posts.length === 0 ? (
+      <p class="text-f1-grey text-center py-12">No posts yet. Check back soon.</p>
+    ) : (
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {posts.map((post, i) => {
+          const date = new Date(post.data.publishedAt).toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'short', year: 'numeric',
+          });
+
+          return (
+            <article
+              class="reveal card-carbon flex flex-col overflow-hidden group"
+              data-delay={i}
+              aria-label={post.data.title}
+            >
+              <!-- Cover -->
+              {post.data.image ? (
+                <div class="h-40 overflow-hidden">
+                  <img
+                    src={post.data.image}
+                    alt=""
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    aria-hidden="true"
+                  />
+                </div>
+              ) : (
+                <div class="h-40 bg-gradient-to-br from-f1-dark to-f1-black flex items-center justify-center border-b border-f1-border">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E10600" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+              )}
+
+              <div class="flex flex-col flex-1 p-5 gap-3">
+                <!-- Tags -->
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-1.5">
+                    {post.data.tags.slice(0, 3).map(tag => (
+                      <span class="font-mono text-[0.6rem] text-f1-grey-dark">{tag}</span>
+                    ))}
+                  </div>
+                )}
+
+                <!-- Title -->
+                <h3 class="font-heading font-700 text-base text-f1-white leading-snug group-hover:text-f1-red transition-colors duration-200">
+                  <a href={`/blog/${post.slug}`} class="no-underline" tabindex="0">
+                    {post.data.title}
+                  </a>
+                </h3>
+
+                <!-- Description -->
+                <p class="text-f1-grey text-sm leading-relaxed flex-1">
+                  {post.data.description}
+                </p>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-between pt-3 border-t border-f1-border">
+                  <time datetime={post.data.publishedAt} class="font-mono text-xs text-f1-grey-dark">
+                    {date}
+                  </time>
+                  <a
+                    href={`/blog/${post.slug}`}
+                    class="font-heading font-700 text-xs text-f1-red hover:text-red-400 tracking-wider uppercase flex items-center gap-1 no-underline transition-colors duration-200"
+                    aria-label={`Read ${post.data.title}`}
+                  >
+                    Read
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</section>

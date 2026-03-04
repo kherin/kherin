@@ -1,0 +1,43 @@
+services:
+  # ── Astro SSR Server ────────────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kherin-web
+    restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4321
+      - NODE_ENV=production
+      - CMS_PASSWORD=${CMS_PASSWORD}
+      - KEYSTATIC_SECRET=${KEYSTATIC_SECRET}
+    # Mount blog content so CMS edits persist without rebuilding
+    volumes:
+      - blog_content:/app/src/content/blog
+    # Expose on host so the system nginx reverse-proxy can reach it
+    ports:
+      - "127.0.0.1:4321:4321"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4321/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ── Dozzle — Docker log viewer ──────────────────────────────────────────────
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "127.0.0.1:9999:8080"
+    environment:
+      - DOZZLE_BASE=/dozzle
+
+volumes:
+  # Named volume so blog content persists across container rebuilds.
+  # On first start, Docker copies the image's /app/src/content/blog into the volume.
+  blog_content:

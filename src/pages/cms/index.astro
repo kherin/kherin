@@ -1,0 +1,74 @@
+---
+export const prerender = false;
+import '../../styles/global.css';
+
+// Redirect if already authenticated
+const session = Astro.cookies.get('cms_session')?.value;
+const secret = process.env.KEYSTATIC_SECRET;
+if (session && secret && session === secret) {
+  return Astro.redirect('/keystatic');
+}
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CMS — Kherin</title>
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body class="bg-f1-black text-f1-white min-h-screen flex items-center justify-center">
+    <!-- Racing stripe at top -->
+    <div class="fixed top-0 left-0 right-0 h-[2px] bg-f1-red z-50"></div>
+
+    <div class="w-full max-w-sm px-6">
+      <!-- Logo -->
+      <div class="mb-8 text-center">
+        <span class="display text-3xl tracking-wider text-f1-white">KB</span>
+        <p class="font-heading text-xs tracking-widest uppercase text-f1-grey mt-1">CMS Admin</p>
+      </div>
+
+      <!-- Card -->
+      <div class="border border-f1-border bg-f1-dark p-8 relative overflow-hidden">
+        <!-- Carbon texture accent -->
+        <div class="absolute top-0 left-0 w-1 h-full bg-f1-red"></div>
+
+        <h1 class="font-heading font-700 text-sm tracking-widest uppercase text-f1-grey mb-6">
+          Sign in
+        </h1>
+
+        {error && (
+          <div class="mb-4 px-3 py-2 border border-f1-red/50 bg-f1-red/10 text-f1-red font-heading text-xs tracking-wide">
+            Invalid password. Try again.
+          </div>
+        )}
+
+        <form method="POST" action="/api/auth/login" class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label for="password" class="font-heading text-xs tracking-widest uppercase text-f1-grey">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              autofocus
+              class="bg-f1-black border border-f1-border text-f1-white font-mono text-sm px-3 py-2 focus:outline-none focus:border-f1-red transition-colors duration-200"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn-f1 w-full justify-center mt-2"
+          >
+            Enter
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

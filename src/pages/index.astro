@@ -1,0 +1,145 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import SkillsSection from '../components/SkillsSection.astro';
+import ProjectsSection from '../components/ProjectsSection.astro';
+import BlogSection from '../components/BlogSection.astro';
+---
+
+<BaseLayout
+  title="Kherin Bundhoo"
+  description="Full-Stack Developer, Data Scientist and Trail Runner from Mauritius. Building web apps, data pipelines, and mobile tools."
+>
+  <Hero />
+
+  <!-- Racing divider -->
+  <div class="racing-stripe" aria-hidden="true"></div>
+
+  <!-- About snippet (teaser) -->
+  <section class="py-20 px-6 max-w-6xl mx-auto" aria-label="About snippet">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div class="reveal">
+        <div class="sector-label mb-3">Driver Profile</div>
+        <h2 class="display text-5xl md:text-6xl text-f1-white mb-5">
+          ABOUT<br/><span class="text-f1-red">ME</span>
+        </h2>
+        <p class="text-f1-grey leading-relaxed mb-4">
+          I'm <strong class="text-f1-white">Kherin Bundhoo</strong>, a software engineer and data scientist from
+          Mauritius. I spend my days building full-stack applications, designing data pipelines, and
+          researching LLM-powered tools.
+        </p>
+        <p class="text-f1-grey leading-relaxed mb-6">
+          When I'm not at my keyboard, I'm on trails — and when I am at my keyboard, I'm often writing
+          Python to analyse the trails I just ran.
+        </p>
+        <a href="/about" class="btn-f1 inline-flex items-center gap-2">
+          Full Profile
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <!-- Stats panel — F1 timing board style -->
+      <div class="reveal grid grid-cols-2 gap-3" data-delay="1">
+        {[
+          { num: '5+',     label: 'Years Experience' },
+          { num: '20+',    label: 'Open Source Repos' },
+          { num: 'PYMUG',  label: 'Speaker & Member' },
+          { num: '🇲🇺',    label: 'Based in Mauritius' },
+        ].map(({ num, label }) => (
+          <div class="card-carbon p-5 text-center">
+            <div class="display text-4xl text-f1-red mb-1">{num}</div>
+            <div class="font-mono text-xs text-f1-grey tracking-wider uppercase">{label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="racing-stripe" aria-hidden="true"></div>
+
+  <SkillsSection />
+
+  <div class="racing-stripe" aria-hidden="true"></div>
+
+  <BlogSection />
+
+  <div class="racing-stripe" aria-hidden="true"></div>
+
+  <!-- Featured Projects (top 3) -->
+  <section class="py-20 px-6 max-w-6xl mx-auto" aria-labelledby="featured-heading">
+    <div class="reveal flex items-end justify-between mb-10 flex-wrap gap-4">
+      <div>
+        <div class="sector-label mb-3">Podium Finishers</div>
+        <h2 id="featured-heading" class="display text-5xl md:text-6xl text-f1-white">
+          FEATURED<br/><span class="text-f1-red">PROJECTS</span>
+        </h2>
+      </div>
+      <a href="/portfolio" class="btn-f1 btn-f1-ghost flex items-center gap-2">
+        Full Portfolio
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+    <div class="reveal grid grid-cols-1 md:grid-cols-3 gap-5">
+      {[
+        {
+          title: 'Project Mitosis',
+          desc:  'LLMs generating and self-integrating code into a live running app.',
+          tags:  ['LLM', 'JavaScript'],
+          href:  'https://github.com/kherin/mitosis',
+          live:  'https://mitosis-six.vercel.app',
+        },
+        {
+          title: 'GTrail Race Data Scraper',
+          desc:  'Automated race result scraping + styled report generation from PowerBI trail dashboards.',
+          tags:  ['Python', 'Playwright', 'Pandas'],
+          href:  'https://github.com/kherin/gtrail_data',
+        },
+        {
+          title: 'Kondir',
+          desc:  'Flutter app for learning Mauritius traffic signs with incremental ML.',
+          tags:  ['Flutter', 'ML'],
+          href:  'https://github.com/kherin/kondir',
+        },
+      ].map(({ title, desc, tags, href, live }, i) => (
+        <div class="reveal card-carbon p-5 flex flex-col gap-3 group" data-delay={i}>
+          <div class="flex justify-between">
+            <span class="font-mono text-xs text-f1-red">P{i + 1}</span>
+            <a href={href} target="_blank" rel="noopener noreferrer" class="text-f1-grey-dark hover:text-f1-red transition-colors" aria-label={`GitHub: ${title}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+          </div>
+          <h3 class="font-heading font-700 text-f1-white group-hover:text-f1-red transition-colors duration-200">{title}</h3>
+          <p class="text-f1-grey text-sm flex-1">{desc}</p>
+          <div class="flex flex-wrap gap-1.5 border-t border-f1-border pt-3">
+            {tags.map(t => (
+              <span class="font-mono text-[0.6rem] text-f1-grey-dark bg-f1-dark px-2 py-0.5 border border-f1-border">{t}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section class="py-20 px-6 bg-f1-dark border-t border-f1-border" aria-label="Contact">
+    <div class="max-w-3xl mx-auto text-center reveal">
+      <div class="sector-label justify-center mb-4">Pit Lane</div>
+      <h2 class="display text-5xl md:text-6xl text-f1-white mb-4">
+        LET'S <span class="text-f1-red">CONNECT</span>
+      </h2>
+      <p class="text-f1-grey mb-8 max-w-xl mx-auto">
+        Open to exciting opportunities, collaborations, and conversations about tech, data, or trail running.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="https://github.com/kherin" target="_blank" rel="noopener noreferrer" class="btn-f1 gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="https://www.kaggle.com/kherin" target="_blank" rel="noopener noreferrer" class="btn-f1 btn-f1-ghost">Kaggle</a>
+        <a href="https://www.datacamp.com/portfolio/kherin" target="_blank" rel="noopener noreferrer" class="btn-f1 btn-f1-ghost">DataCamp</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,69 @@
+---
+export const prerender = false;
+
+import { getCollection, getEntry } from 'astro:content';
+import BlogPostLayout from '../../layouts/BlogPostLayout.astro';
+
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect('/blog', 301);
+
+const post = await getEntry('blog', slug);
+
+if (!post || post.data.draft) {
+  return Astro.redirect('/blog', 302);
+}
+
+const { Content } = await post.render();
+
+// Estimate reading time
+const words = post.body.trim().split(/\s+/).length;
+const readingTime = Math.ceil(words / 200);
+
+// Fetch related posts (same tags, excluding current)
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const related = allPosts
+  .filter(p => p.slug !== post.slug && p.data.tags?.some(t => post.data.tags?.includes(t)))
+  .slice(0, 3);
+---
+
+<BlogPostLayout
+  title={post.data.title}
+  description={post.data.description}
+  publishedAt={post.data.publishedAt}
+  tags={post.data.tags}
+  image={post.data.image}
+  readingTime={readingTime}
+>
+  <Content />
+
+  {related.length > 0 && (
+    <div class="mt-16">
+      <div class="racing-stripe mb-8" aria-hidden="true"></div>
+      <h2 class="font-heading font-700 text-lg text-f1-white mb-5 tracking-wider uppercase">Related Posts</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {related.map(p => (
+          <a
+            href={`/blog/${p.slug}`}
+            class="card-carbon p-4 flex flex-col gap-2 no-underline group"
+            aria-label={p.data.title}
+          >
+            {p.data.tags && p.data.tags.length > 0 && (
+              <div class="flex flex-wrap gap-1">
+                {p.data.tags.slice(0, 2).map(t => (
+                  <span class="font-mono text-[0.6rem] text-f1-grey-dark">{t}</span>
+                ))}
+              </div>
+            )}
+            <p class="font-heading font-700 text-sm text-f1-white group-hover:text-f1-red transition-colors duration-200 leading-snug">
+              {p.data.title}
+            </p>
+            <time datetime={p.data.publishedAt} class="font-mono text-[0.65rem] text-f1-grey-dark mt-auto">
+              {new Date(p.data.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </time>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+</BlogPostLayout>

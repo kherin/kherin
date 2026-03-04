@@ -1,0 +1,250 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="Kherin Bundhoo — Full-Stack Developer, Data Scientist, and Trail Runner from Mauritius. Learn about my background, tech stack, and community involvement."
+>
+  <!-- Page header -->
+  <div class="relative py-16 px-6 border-b border-f1-border overflow-hidden bg-f1-dark">
+    <div class="absolute inset-0 speed-lines-bg opacity-30 pointer-events-none" aria-hidden="true"></div>
+    <div class="relative max-w-6xl mx-auto">
+      <div class="sector-label mb-3">Driver Profile</div>
+      <h1 class="page-title display text-6xl md:text-8xl text-f1-white">
+        ABOUT <span class="text-f1-red">ME</span>
+      </h1>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-6 py-16 space-y-20">
+
+    <!-- Bio section -->
+    <section class="reveal grid grid-cols-1 md:grid-cols-5 gap-10 items-start" aria-labelledby="bio-heading">
+      <div class="md:col-span-3">
+        <div class="sector-label mb-4">Who I Am</div>
+        <h2 id="bio-heading" class="font-heading text-3xl font-700 text-f1-white mb-5">Kherin Bundhoo</h2>
+
+        <div class="space-y-4 text-f1-grey leading-relaxed">
+          <p>
+            I'm a software engineer and data scientist from <strong class="text-f1-white">Mauritius 🇲🇺</strong>,
+            specialising in full-stack web development, data pipelines, and mobile apps. I work across
+            Python, TypeScript, and Dart day-to-day, shipping everything from NestJS APIs to Flutter
+            apps to Jupyter notebooks.
+          </p>
+          <p>
+            My current focus sits at the intersection of <strong class="text-f1-white">data science and sports analytics</strong>
+            — specifically, building tools that turn raw GPS and race data into actionable insights for
+            trail runners and race organisers in Mauritius.
+          </p>
+          <p>
+            I'm an active member of the <strong class="text-f1-white">Python Mauritius User Group (PYMUG)</strong>,
+            where I gave a talk on <em>"Securing React packages with Semgrep"</em> — covering static analysis
+            rules for common React security pitfalls.
+          </p>
+          <p>
+            When I'm off the keyboard I'm on trails. Running informs how I think about systems — pace,
+            endurance, incremental improvement. If a training block is a sprint, a project is a stage race.
+          </p>
+        </div>
+      </div>
+
+      <!-- Side panel: quick stats -->
+      <div class="md:col-span-2 space-y-3" data-delay="1">
+        {[
+          { label: 'Location',    value: 'Mauritius 🇲🇺' },
+          { label: 'Focus',       value: 'Full-Stack & Data Science' },
+          { label: 'Status',      value: 'Open to Work ✓' },
+          { label: 'Community',   value: 'PYMUG Member & Speaker' },
+          { label: 'Languages',   value: 'Python · TypeScript · Dart' },
+          { label: 'Hobby',       value: 'Trail Running 🏃' },
+        ].map(({ label, value }) => (
+          <div class="card-carbon p-4 flex items-start gap-3">
+            <span class="font-mono text-[0.65rem] text-f1-red tracking-wider uppercase min-w-[90px] pt-0.5">{label}</span>
+            <span class="text-f1-white text-sm">{value}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <div class="racing-stripe" aria-hidden="true"></div>
+
+    <!-- Current focus -->
+    <section class="reveal" aria-labelledby="focus-heading">
+      <div class="sector-label mb-4">Current Lap</div>
+      <h2 id="focus-heading" class="display text-4xl text-f1-white mb-8">CURRENT FOCUS</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        {[
+          {
+            title: 'Sports Analytics',
+            desc:  'Building GPS / race-data tools for trail running — scraping race results, analysing Garmin GPX tracks, generating performance reports.',
+            icon: '🏃',
+          },
+          {
+            title: 'Computer Vision & OCR',
+            desc:  'Developing document-scanning pipelines that extract structured data from images using OpenCV, MediaPipe, and Azure Form Recognizer.',
+            icon: '👁️',
+          },
+          {
+            title: 'LLM Research',
+            desc:  'Investigating how large language models can generate and autonomously integrate code — Project Mitosis is the live experiment.',
+            icon: '🤖',
+          },
+        ].map(({ title, desc, icon }, i) => (
+          <div class="card-carbon p-6 flex flex-col gap-3" data-delay={i}>
+            <div class="text-3xl">{icon}</div>
+            <h3 class="font-heading font-700 text-f1-white text-lg">{title}</h3>
+            <p class="text-f1-grey text-sm leading-relaxed flex-1">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <div class="racing-stripe" aria-hidden="true"></div>
+
+    <!-- Tech stack detail -->
+    <section class="reveal" aria-labelledby="stack-heading">
+      <div class="sector-label mb-4">Technical Stack</div>
+      <h2 id="stack-heading" class="display text-4xl text-f1-white mb-8">TECH STACK</h2>
+
+      <div class="space-y-8">
+        {[
+          {
+            label: 'Languages',
+            sn:    'S1',
+            items: ['Python', 'TypeScript', 'JavaScript', 'Dart', 'SQL'],
+          },
+          {
+            label: 'Frameworks & Libraries',
+            sn:    'S2',
+            items: ['React', 'Vue.js', 'NestJS', 'Django', 'Flutter', 'Astro', 'Node.js'],
+          },
+          {
+            label: 'Data Science & ML',
+            sn:    'S3',
+            items: ['Pandas', 'Jupyter', 'OpenCV', 'MediaPipe', 'scikit-learn', 'Playwright', 'gpxpy', 'Azure Form Recognizer'],
+          },
+          {
+            label: 'Cloud, DevOps & Tools',
+            sn:    'S4',
+            items: ['Docker', 'Azure', 'GitHub Actions', 'Ansible', 'Semgrep', 'Git', 'Vercel'],
+          },
+        ].map(({ label, sn, items }, i) => (
+          <div class="reveal" data-delay={i}>
+            <div class="flex items-center gap-3 mb-3">
+              <span class="font-mono text-xs font-700 text-f1-red border border-f1-red px-2 py-0.5">{sn}</span>
+              <span class="font-heading font-700 text-sm text-f1-grey tracking-widest uppercase">{label}</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {items.map(item => (
+                <span class="font-mono text-xs text-f1-white bg-f1-card border border-f1-border px-3 py-1.5 hover:border-f1-red hover:text-f1-red transition-colors duration-200 cursor-default">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <div class="racing-stripe" aria-hidden="true"></div>
+
+    <!-- Community -->
+    <section class="reveal" aria-labelledby="community-heading">
+      <div class="sector-label mb-4">Pit Crew</div>
+      <h2 id="community-heading" class="display text-4xl text-f1-white mb-8">COMMUNITY</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="card-carbon p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="display text-2xl text-f1-red">PY</span>
+            <div>
+              <div class="font-heading font-700 text-f1-white">Python Mauritius User Group</div>
+              <div class="font-mono text-xs text-f1-grey-dark">PYMUG — Member & Speaker</div>
+            </div>
+          </div>
+          <p class="text-f1-grey text-sm leading-relaxed">
+            Active contributor to the Mauritius Python community. Gave a talk on
+            <em>"Securing React packages with Semgrep"</em> — covering static analysis
+            rules for common React security pitfalls, live demos, and OWASP top 10 vulnerabilities.
+          </p>
+          <div class="mt-4">
+            <a
+              href="https://github.com/kherin/semgrep-talk"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-f1 btn-f1-ghost text-xs gap-1.5"
+            >
+              Talk Resources ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="card-carbon p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="display text-2xl text-f1-red">OS</span>
+            <div>
+              <div class="font-heading font-700 text-f1-white">Open Source</div>
+              <div class="font-mono text-xs text-f1-grey-dark">GitHub — @kherin</div>
+            </div>
+          </div>
+          <p class="text-f1-grey text-sm leading-relaxed">
+            20+ public repositories spanning data science tooling, mobile apps, web experiments,
+            GitHub Actions, and DevOps automation. Everything from PyPI packages to
+            Azure pipeline integration tests.
+          </p>
+          <div class="mt-4">
+            <a
+              href="https://github.com/kherin"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-f1 btn-f1-ghost text-xs gap-1.5"
+            >
+              GitHub Profile ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="racing-stripe" aria-hidden="true"></div>
+
+    <!-- Learning / Certifications -->
+    <section class="reveal" aria-labelledby="learning-heading">
+      <div class="sector-label mb-4">Training Sessions</div>
+      <h2 id="learning-heading" class="display text-4xl text-f1-white mb-8">LEARNING</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <a
+          href="https://www.kaggle.com/kherin/code"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="card-carbon p-6 flex items-center gap-4 group no-underline"
+        >
+          <div class="w-12 h-12 bg-[#20BEFF]/10 border border-[#20BEFF]/30 flex items-center justify-center text-[#20BEFF] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.825 23.859c-.022.092-.117.141-.281.141h-3.139c-.187 0-.351-.082-.492-.248l-5.178-6.589-1.448 1.374v5.111c0 .235-.117.352-.351.352H5.505c-.236 0-.354-.117-.354-.352V.353c0-.233.118-.353.354-.353h2.431c.234 0 .351.12.351.353v14.343l6.203-6.272c.165-.165.33-.246.495-.246h3.239c.144 0 .236.06.285.18.046.149.034.255-.036.315l-6.555 6.344 6.836 8.507c.095.104.117.208.07.334z"/></svg>
+          </div>
+          <div>
+            <div class="font-heading font-700 text-f1-white group-hover:text-f1-red transition-colors duration-200">Kaggle</div>
+            <div class="font-mono text-xs text-f1-grey-dark">Notebooks, competitions & datasets</div>
+          </div>
+        </a>
+        <a
+          href="https://www.datacamp.com/portfolio/kherin"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="card-carbon p-6 flex items-center gap-4 group no-underline"
+        >
+          <div class="w-12 h-12 bg-[#03EF62]/10 border border-[#03EF62]/30 flex items-center justify-center text-[#03EF62] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.931 8.67L10.35 7.246c-.198-.11-.428-.11-.626 0l-2.58 1.423A1.246 1.246 0 0 0 6.5 9.773v2.861c0 .453.242.872.644 1.098l2.58 1.424c.2.11.428.11.626 0l.9-.496v2.48l-3.68 2.032-7.07-3.904V7.437L7.57 3.533l4.62 2.55V8.67zm-1.86 6.66l3.68-2.03 7.07 3.904v7.026l-7.07 3.906-3.68-2.032v-2.48l.9.497c.2.11.427.11.626 0l2.58-1.424a1.25 1.25 0 0 0 .644-1.098v-2.86a1.25 1.25 0 0 0-.644-1.1l-2.58-1.42c-.2-.112-.427-.112-.627 0l-.9.496V15.33z"/></svg>
+          </div>
+          <div>
+            <div class="font-heading font-700 text-f1-white group-hover:text-f1-red transition-colors duration-200">DataCamp</div>
+            <div class="font-mono text-xs text-f1-grey-dark">Courses, projects & skill tracks</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

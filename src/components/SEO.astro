@@ -1,0 +1,106 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonical?: string;
+  type?: 'website' | 'article';
+  publishedAt?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description,
+  image = '/og-default.png',
+  canonical,
+  type = 'website',
+  publishedAt,
+  tags = [],
+} = Astro.props;
+
+const siteUrl = 'https://kherin.com';
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
+const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).href;
+const fullTitle = title === 'Kherin Bundhoo' ? title : `${title} | Kherin Bundhoo`;
+
+const jsonLd = type === 'article'
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      image: imageUrl,
+      url: canonicalUrl,
+      datePublished: publishedAt,
+      author: {
+        '@type': 'Person',
+        name: 'Kherin Bundhoo',
+        url: siteUrl,
+        sameAs: [
+          'https://github.com/kherin',
+          'https://www.kaggle.com/kherin',
+        ],
+      },
+      publisher: {
+        '@type': 'Person',
+        name: 'Kherin Bundhoo',
+        url: siteUrl,
+      },
+      keywords: tags.join(', '),
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Kherin Bundhoo',
+      url: siteUrl,
+      jobTitle: ['Full-Stack Developer', 'Data Scientist', 'Mobile Developer'],
+      description,
+      image: imageUrl,
+      sameAs: [
+        'https://github.com/kherin',
+        'https://www.kaggle.com/kherin',
+        'https://www.datacamp.com/portfolio/kherin',
+      ],
+      knowsAbout: ['Python', 'TypeScript', 'React', 'Data Science', 'Machine Learning', 'Flutter', 'Docker'],
+      address: { '@type': 'PostalAddress', addressCountry: 'MU' },
+    };
+---
+
+<title>{fullTitle}</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content={description} />
+<meta name="author" content="Kherin Bundhoo" />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Open Graph -->
+<meta property="og:type"        content={type} />
+<meta property="og:title"       content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image"       content={imageUrl} />
+<meta property="og:url"         content={canonicalUrl} />
+<meta property="og:site_name"   content="Kherin Bundhoo" />
+<meta property="og:locale"      content="en_US" />
+{publishedAt && <meta property="article:published_time" content={publishedAt} />}
+{tags.map(tag => <meta property="article:tag" content={tag} />)}
+
+<!-- Twitter / X -->
+<meta name="twitter:card"        content="summary_large_image" />
+<meta name="twitter:title"       content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image"       content={imageUrl} />
+<meta name="twitter:creator"     content="@kherin" />
+
+<!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="manifest" href="/site.webmanifest" />
+
+<!-- Preconnect for Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

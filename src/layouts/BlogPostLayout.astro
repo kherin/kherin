@@ -1,0 +1,118 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  publishedAt: string;
+  tags?: string[];
+  image?: string;
+  readingTime?: number;
+}
+
+const { title, description, publishedAt, tags = [], image, readingTime } = Astro.props;
+
+const formattedDate = new Date(publishedAt).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={image}
+  type="article"
+  publishedAt={publishedAt}
+  tags={tags}
+>
+  <article class="max-w-3xl mx-auto px-6 py-16" itemscope itemtype="https://schema.org/BlogPosting">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <ol class="flex items-center gap-2 font-mono text-xs text-f1-grey list-none m-0 p-0">
+        <li><a href="/" class="hover:text-f1-red transition-colors no-underline">Home</a></li>
+        <li class="text-f1-border">›</li>
+        <li><a href="/blog" class="hover:text-f1-red transition-colors no-underline">Blog</a></li>
+        <li class="text-f1-border">›</li>
+        <li class="text-f1-grey-dark truncate max-w-[200px]" aria-current="page">{title}</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <header class="mb-10">
+      <!-- Tags -->
+      {tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mb-4">
+          {tags.map(tag => (
+            <span class="drs-pill">{tag}</span>
+          ))}
+        </div>
+      )}
+
+      <!-- Title -->
+      <h1
+        class="page-title font-heading text-3xl md:text-4xl font-700 text-f1-white leading-tight mb-4"
+        itemprop="headline"
+      >{title}</h1>
+
+      <!-- Meta row -->
+      <div class="flex flex-wrap items-center gap-4 font-mono text-xs text-f1-grey">
+        <time datetime={publishedAt} itemprop="datePublished" class="flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {formattedDate}
+        </time>
+        {readingTime && (
+          <span class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            {readingTime} min read
+          </span>
+        )}
+        <span class="flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Kherin Bundhoo
+        </span>
+      </div>
+
+      <!-- Racing stripe -->
+      <div class="racing-stripe mt-6"></div>
+    </header>
+
+    <!-- Cover image -->
+    {image && (
+      <div class="mb-10 overflow-hidden border border-f1-border">
+        <img
+          src={image}
+          alt={`Cover image for ${title}`}
+          class="w-full h-56 md:h-72 object-cover"
+          loading="eager"
+          itemprop="image"
+        />
+      </div>
+    )}
+
+    <!-- Content -->
+    <div class="prose" itemprop="articleBody">
+      <slot />
+    </div>
+
+    <!-- Footer of post -->
+    <div class="mt-12 pt-8 border-t border-f1-border">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <a
+          href="/blog"
+          class="btn-f1 btn-f1-ghost flex items-center gap-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All Posts
+        </a>
+        {tags.length > 0 && (
+          <div class="flex flex-wrap gap-2">
+            {tags.map(tag => <span class="drs-pill">{tag}</span>)}
+          </div>
+        )}
+      </div>
+    </div>
+  </article>
+</BaseLayout>

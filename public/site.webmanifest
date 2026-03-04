@@ -1,0 +1,12 @@
+{
+  "name": "Kherin Bundhoo",
+  "short_name": "KB",
+  "description": "Full-Stack Developer, Data Scientist & Trail Runner from Mauritius",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#E10600",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

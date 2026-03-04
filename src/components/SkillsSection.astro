@@ -1,0 +1,141 @@
+---
+interface Skill {
+  name: string;
+  level: number; // 0-100
+}
+interface Category {
+  label: string;
+  sectorNum: string;
+  skills: Skill[];
+  color?: string;
+}
+
+const categories: Category[] = [
+  {
+    label: 'Languages',
+    sectorNum: 'S1',
+    skills: [
+      { name: 'Python',     level: 95 },
+      { name: 'TypeScript', level: 88 },
+      { name: 'JavaScript', level: 90 },
+      { name: 'Dart',       level: 75 },
+      { name: 'SQL',        level: 82 },
+    ],
+  },
+  {
+    label: 'Frameworks & Libraries',
+    sectorNum: 'S2',
+    skills: [
+      { name: 'React',    level: 90 },
+      { name: 'Vue.js',   level: 80 },
+      { name: 'NestJS',   level: 78 },
+      { name: 'Django',   level: 85 },
+      { name: 'Flutter',  level: 75 },
+      { name: 'Astro',    level: 82 },
+      { name: 'Node.js',  level: 88 },
+    ],
+  },
+  {
+    label: 'Data Science & ML',
+    sectorNum: 'S3',
+    skills: [
+      { name: 'Pandas',          level: 92 },
+      { name: 'OpenCV',          level: 80 },
+      { name: 'scikit-learn',    level: 78 },
+      { name: 'Jupyter',         level: 90 },
+      { name: 'Playwright (scraping)', level: 82 },
+      { name: 'LLM Integration', level: 78 },
+    ],
+  },
+  {
+    label: 'Cloud, DevOps & Tools',
+    sectorNum: 'S4',
+    skills: [
+      { name: 'Docker',          level: 85 },
+      { name: 'Azure',           level: 78 },
+      { name: 'GitHub Actions',  level: 88 },
+      { name: 'Ansible',         level: 72 },
+      { name: 'Semgrep',         level: 75 },
+      { name: 'Git',             level: 95 },
+    ],
+  },
+];
+---
+
+<section id="skills" class="py-24 px-6 max-w-6xl mx-auto" aria-labelledby="skills-heading">
+  <div class="reveal">
+    <div class="sector-label mb-3">Technical Telemetry</div>
+    <h2 id="skills-heading" class="display text-5xl md:text-6xl text-f1-white mb-2">
+      SKILL<span class="text-f1-red">SET</span>
+    </h2>
+    <p class="text-f1-grey font-body max-w-xl mb-12">
+      Five years across the full stack — from Python data pipelines to Flutter mobile apps to Azure CI/CD.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {categories.map((cat, ci) => (
+      <div class="reveal card-carbon p-6 relative" data-delay={ci}>
+        <!-- Sector badge -->
+        <div class="absolute top-4 right-4 font-mono text-xs font-700 text-f1-red border border-f1-red px-2 py-0.5">
+          {cat.sectorNum}
+        </div>
+
+        <h3 class="font-heading font-700 text-base tracking-widest uppercase text-f1-grey mb-5">
+          {cat.label}
+        </h3>
+
+        <ul class="space-y-3.5 list-none m-0 p-0">
+          {cat.skills.map((skill, si) => (
+            <li class="group">
+              <div class="flex justify-between items-center mb-1.5">
+                <span class="font-mono text-xs text-f1-white group-hover:text-f1-red transition-colors duration-200">
+                  {skill.name}
+                </span>
+                <span class="font-mono text-xs text-f1-grey-dark tabular-nums">
+                  {skill.level}%
+                </span>
+              </div>
+              <div
+                class="telemetry-bar"
+                role="progressbar"
+                aria-valuenow={skill.level}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${skill.name} proficiency ${skill.level}%`}
+              >
+                <div
+                  class="telemetry-bar-fill"
+                  style={`width: 0%; transition-delay: ${(ci * 4 + si) * 50}ms`}
+                  data-target={skill.level}
+                ></div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  // Animate bars when they enter the viewport
+  const animateBars = () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll<HTMLElement>('[data-target]').forEach(bar => {
+            const target = bar.dataset.target ?? '0';
+            bar.style.width = `${target}%`;
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('#skills .card-carbon').forEach(el => observer.observe(el));
+  };
+
+  animateBars();
+  document.addEventListener('astro:after-swap', animateBars);
+</script>

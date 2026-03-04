@@ -1,0 +1,141 @@
+---
+export const prerender = false;
+
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts.sort(
+  (a, b) => new Date(b.data.publishedAt).valueOf() - new Date(a.data.publishedAt).valueOf()
+);
+
+// Collect all unique tags
+const allTags = [...new Set(posts.flatMap(p => p.data.tags ?? []))].sort();
+
+// Tag filter from URL
+const tagFilter = Astro.url.searchParams.get('tag') ?? '';
+const filtered  = tagFilter ? posts.filter(p => p.data.tags?.includes(tagFilter)) : posts;
+---
+
+<BaseLayout
+  title="Blog"
+  description="Kherin Bundhoo's blog — posts about full-stack development, data science, trail running analysis, Python, and open source."
+>
+  <!-- Header -->
+  <div class="relative py-16 px-6 border-b border-f1-border overflow-hidden bg-f1-dark">
+    <div class="absolute inset-0 speed-lines-bg opacity-30 pointer-events-none" aria-hidden="true"></div>
+    <div class="relative max-w-6xl mx-auto flex items-end justify-between flex-wrap gap-4">
+      <div>
+        <div class="sector-label mb-3">Race Reports</div>
+        <h1 class="page-title display text-6xl md:text-8xl text-f1-white">
+          THE <span class="text-f1-red">BLOG</span>
+        </h1>
+      </div>
+      <p class="text-f1-grey max-w-sm">
+        Notes on code, data science, trail running, and whatever else keeps me up at night.
+      </p>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-6 py-12">
+
+    <!-- Tag filters -->
+    {allTags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-10" role="navigation" aria-label="Filter by tag">
+        <a
+          href="/blog"
+          class:list={[
+            'font-heading font-600 text-xs tracking-widest uppercase px-3 py-1.5 border transition-colors duration-200 no-underline',
+            !tagFilter ? 'border-f1-red text-f1-white bg-f1-red/10' : 'border-f1-border text-f1-grey hover:border-f1-red hover:text-f1-white',
+          ]}
+          aria-current={!tagFilter ? 'page' : undefined}
+        >All</a>
+        {allTags.map(tag => (
+          <a
+            href={`/blog?tag=${encodeURIComponent(tag)}`}
+            class:list={[
+              'font-heading font-600 text-xs tracking-widest uppercase px-3 py-1.5 border transition-colors duration-200 no-underline',
+              tagFilter === tag ? 'border-f1-red text-f1-white bg-f1-red/10' : 'border-f1-border text-f1-grey hover:border-f1-red hover:text-f1-white',
+            ]}
+            aria-current={tagFilter === tag ? 'page' : undefined}
+          >{tag}</a>
+        ))}
+      </div>
+    )}
+
+    <!-- Post count -->
+    <p class="font-mono text-xs text-f1-grey-dark mb-8 tracking-wider">
+      {filtered.length} {filtered.length === 1 ? 'post' : 'posts'}
+      {tagFilter && <> tagged <span class="text-f1-red">"{tagFilter}"</span></>}
+    </p>
+
+    {filtered.length === 0 ? (
+      <div class="text-center py-20">
+        <p class="text-f1-grey text-lg mb-4">No posts found.</p>
+        <a href="/blog" class="btn-f1 btn-f1-ghost">Clear filter</a>
+      </div>
+    ) : (
+      <div class="space-y-6">
+        {filtered.map((post, i) => {
+          const date = new Date(post.data.publishedAt).toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric',
+          });
+          const words = post.body.trim().split(/\s+/).length;
+          const readingTime = Math.ceil(words / 200);
+
+          return (
+            <article
+              class="reveal card-carbon flex flex-col md:flex-row gap-0 overflow-hidden group"
+              data-delay={i % 3}
+              aria-label={post.data.title}
+            >
+              <!-- Date strip (left side on md+) -->
+              <div class="md:w-36 shrink-0 flex md:flex-col items-center md:items-start justify-between md:justify-start gap-2 p-4 md:p-5 bg-f1-dark border-b md:border-b-0 md:border-r border-f1-border">
+                <time
+                  datetime={post.data.publishedAt}
+                  class="font-mono text-xs text-f1-grey-dark leading-relaxed"
+                >
+                  {date}
+                </time>
+                <span class="font-mono text-[0.6rem] text-f1-grey-dark">{readingTime} min</span>
+              </div>
+
+              <!-- Content -->
+              <div class="flex-1 p-5 flex flex-col gap-3">
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-1.5">
+                    {post.data.tags.slice(0, 4).map(tag => (
+                      <a
+                        href={`/blog?tag=${encodeURIComponent(tag)}`}
+                        class="drs-pill no-underline hover:bg-f1-red/20 transition-colors duration-150"
+                      >{tag}</a>
+                    ))}
+                  </div>
+                )}
+
+                <h2 class="font-heading font-700 text-xl text-f1-white leading-snug group-hover:text-f1-red transition-colors duration-200">
+                  <a href={`/blog/${post.slug}`} class="no-underline">{post.data.title}</a>
+                </h2>
+
+                <p class="text-f1-grey text-sm leading-relaxed flex-1">
+                  {post.data.description}
+                </p>
+
+                <div class="pt-2">
+                  <a
+                    href={`/blog/${post.slug}`}
+                    class="btn-f1 btn-f1-ghost text-xs inline-flex items-center gap-1.5"
+                    aria-label={`Read ${post.data.title}`}
+                  >
+                    Read Post
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</BaseLayout>

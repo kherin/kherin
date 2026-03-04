@@ -1,0 +1,370 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties ─────────────────────────────────── */
+:root {
+  --f1-red:       #E10600;
+  --f1-red-dark:  #C00000;
+  --f1-black:     #0A0A0A;
+  --f1-dark:      #111111;
+  --f1-card:      #161616;
+  --f1-border:    #1F1F1F;
+  --f1-grey:      #A0A0A0;
+  --f1-white:     #FFFFFF;
+  --transition-f1: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── View Transitions ────────────────────────────────────────── */
+/* F1-style horizontal wipe */
+@keyframes vt-slide-out {
+  to {
+    transform: translateX(-100%);
+    clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
+  }
+}
+@keyframes vt-slide-in {
+  from {
+    transform: translateX(100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 20% 100%);
+  }
+}
+@keyframes vt-fade-out {
+  to { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+}
+
+::view-transition-old(root) {
+  animation: vt-slide-out 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+::view-transition-new(root) {
+  animation: vt-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* Named transitions for specific elements */
+.nav-title { view-transition-name: nav-title; }
+.page-title { view-transition-name: page-title; }
+
+::view-transition-old(nav-title),
+::view-transition-new(nav-title) {
+  animation: none;
+}
+::view-transition-old(page-title) {
+  animation: vt-fade-out 0.2s ease forwards;
+}
+::view-transition-new(page-title) {
+  animation: vt-fade-in 0.3s 0.15s ease forwards;
+}
+
+/* ─── Base Resets ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--f1-black);
+  color: var(--f1-white);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--f1-red);
+  color: #fff;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--f1-dark); }
+::-webkit-scrollbar-thumb { background: var(--f1-red); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #ff2a2a; }
+
+/* ─── Typography ─────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+}
+
+.display {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+/* ─── Section Label (F1 Sector Style) ───────────────────────── */
+.sector-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--f1-red);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sector-label::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  background: var(--f1-red);
+  flex-shrink: 0;
+}
+
+/* ─── Racing Stripe Divider ─────────────────────────────────── */
+.racing-stripe {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--f1-red) 20%,
+    var(--f1-red) 80%,
+    transparent 100%
+  );
+  position: relative;
+}
+.racing-stripe::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  filter: blur(4px);
+  opacity: 0.5;
+}
+
+/* ─── Carbon Fibre Card ─────────────────────────────────────── */
+.card-carbon {
+  background-color: var(--f1-card);
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6L6 0L12 6L6 12Z' fill='%23161616' stroke='%231A1A1A' stroke-width='0.5'/%3E%3C/svg%3E");
+  border: 1px solid var(--f1-border);
+  position: relative;
+}
+.card-carbon::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  right: 0; height: 2px;
+  background: var(--f1-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-f1);
+}
+.card-carbon:hover::before {
+  transform: scaleX(1);
+}
+
+/* ─── Red Accent Button ─────────────────────────────────────── */
+.btn-f1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.4rem;
+  background: var(--f1-red);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 100%, 8px 100%);
+  transition: background var(--transition-f1), transform var(--transition-f1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.btn-f1:hover {
+  background: #ff2a2a;
+  transform: translateX(2px);
+}
+.btn-f1-ghost {
+  background: transparent;
+  border: 1px solid var(--f1-border);
+  color: var(--f1-grey);
+  clip-path: none;
+}
+.btn-f1-ghost:hover {
+  border-color: var(--f1-red);
+  color: var(--f1-white);
+  background: rgba(225,6,0,0.08);
+  transform: none;
+}
+
+/* ─── Skill / Telemetry Bar ──────────────────────────────────── */
+.telemetry-bar {
+  height: 3px;
+  background: var(--f1-border);
+  position: relative;
+  overflow: hidden;
+}
+.telemetry-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--f1-red-dark), var(--f1-red));
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 6px rgba(225, 6, 0, 0.6);
+}
+
+/* ─── DRS Indicator Pill ─────────────────────────────────────── */
+.drs-pill {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--f1-red);
+  color: var(--f1-red);
+  background: rgba(225, 6, 0, 0.1);
+}
+
+/* ─── Section Animations ─────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Prose (blog content) ───────────────────────────────────── */
+.prose {
+  color: #d1d1d1;
+  max-width: 72ch;
+}
+.prose h1, .prose h2, .prose h3 {
+  color: var(--f1-white);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose h1 { font-size: 2rem; }
+.prose h2 {
+  font-size: 1.5rem;
+  border-left: 3px solid var(--f1-red);
+  padding-left: 0.75rem;
+}
+.prose h3 { font-size: 1.25rem; color: #e0e0e0; }
+.prose p  { margin-bottom: 1.25rem; }
+.prose a  { color: var(--f1-red); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { color: #ff4444; }
+.prose strong { color: var(--f1-white); font-weight: 600; }
+.prose code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  background: #1a1a1a;
+  border: 1px solid var(--f1-border);
+  padding: 0.1em 0.4em;
+  border-radius: 2px;
+  color: #e0e0e0;
+}
+.prose pre {
+  background: #111;
+  border: 1px solid var(--f1-border);
+  border-left: 3px solid var(--f1-red);
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+.prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+.prose blockquote {
+  border-left: 3px solid var(--f1-red);
+  padding-left: 1rem;
+  margin-left: 0;
+  color: var(--f1-grey);
+  font-style: italic;
+}
+.prose ul  { list-style: none; padding-left: 0; }
+.prose ul li {
+  padding-left: 1.25rem;
+  position: relative;
+  margin-bottom: 0.4rem;
+}
+.prose ul li::before {
+  content: '▸';
+  color: var(--f1-red);
+  position: absolute;
+  left: 0;
+}
+.prose ol { padding-left: 1.5rem; }
+.prose ol li { margin-bottom: 0.4rem; }
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+.prose th {
+  background: #1a1a1a;
+  color: var(--f1-white);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--f1-red);
+}
+.prose td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--f1-border);
+}
+.prose hr {
+  border: none;
+  height: 1px;
+  background: var(--f1-border);
+  margin: 2rem 0;
+}
+
+/* ─── Utility ────────────────────────────────────────────────── */
+.text-gradient {
+  background: linear-gradient(135deg, #fff 0%, var(--f1-grey) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-red-gradient {
+  background: linear-gradient(135deg, var(--f1-red) 0%, #ff6060 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Speed-line background pattern */
+.speed-lines-bg {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 18px,
+    rgba(255,255,255,0.015) 18px,
+    rgba(255,255,255,0.015) 19px
+  );
+}

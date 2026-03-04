@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#0A0A0A"/>
+  <!-- Red racing stripe -->
+  <rect x="0" y="30" width="64" height="4" fill="#E10600"/>
+  <!-- KB monogram -->
+  <text x="8" y="50" font-family="Arial Narrow, Arial, sans-serif" font-weight="900" font-size="38" fill="#FFFFFF" letter-spacing="-2">KB</text>
+</svg>

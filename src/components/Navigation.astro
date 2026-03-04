@@ -1,0 +1,142 @@
+---
+const pathname = Astro.url.pathname;
+
+const links = [
+  { href: '/',          label: 'Home',      key: 'home' },
+  { href: '/about',     label: 'About',     key: 'about' },
+  { href: '/portfolio', label: 'Portfolio', key: 'portfolio' },
+  { href: '/blog',      label: 'Blog',      key: 'blog' },
+];
+
+function isActive(href: string): boolean {
+  if (href === '/') return pathname === '/';
+  return pathname.startsWith(href);
+}
+---
+
+<header
+  id="nav"
+  class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+  role="banner"
+>
+  <!-- Racing stripe at very top -->
+  <div class="h-[2px] bg-f1-red w-full"></div>
+
+  <nav
+    class="flex items-center justify-between px-6 md:px-10 h-14 bg-f1-black/90 backdrop-blur-md border-b border-f1-border"
+    aria-label="Main navigation"
+  >
+    <!-- Logo -->
+    <a
+      href="/"
+      class="nav-title flex items-center gap-2 group no-underline"
+      aria-label="Kherin Bundhoo — Home"
+    >
+      <!-- F1-style car number plate -->
+      <span
+        class="display text-lg text-f1-white group-hover:text-f1-red transition-colors duration-200 tracking-wider"
+      >KB</span>
+      <span class="hidden sm:block w-px h-5 bg-f1-border"></span>
+      <span
+        class="hidden sm:block font-heading text-sm font-600 text-f1-grey tracking-widest uppercase group-hover:text-f1-white transition-colors duration-200"
+      >Kherin Bundhoo</span>
+    </a>
+
+    <!-- Desktop links -->
+    <ul class="hidden md:flex items-center gap-1 list-none m-0 p-0" role="list">
+      {links.map(({ href, label, key }) => (
+        <li>
+          <a
+            href={href}
+            class:list={[
+              'relative font-heading font-600 text-sm tracking-widest uppercase px-4 py-2 transition-colors duration-200 no-underline group flex flex-col items-center gap-0.5',
+              isActive(href) ? 'text-f1-white' : 'text-f1-grey hover:text-f1-white',
+            ]}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
+            {label}
+            <span
+              class:list={[
+                'block h-[2px] w-0 bg-f1-red transition-all duration-300 group-hover:w-full',
+                isActive(href) ? 'w-full' : '',
+              ]}
+            ></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Mobile hamburger -->
+    <button
+      id="nav-toggle"
+      class="md:hidden flex flex-col gap-[5px] p-2 group"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span class="block w-6 h-[2px] bg-f1-white transition-all duration-300 group-aria-[expanded=true]:rotate-45 group-aria-[expanded=true]:translate-y-[7px]"></span>
+      <span class="block w-6 h-[2px] bg-f1-white transition-opacity duration-300 group-aria-[expanded=true]:opacity-0"></span>
+      <span class="block w-6 h-[2px] bg-f1-white transition-all duration-300 group-aria-[expanded=true]:-rotate-45 group-aria-[expanded=true]:-translate-y-[7px]"></span>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div
+    id="mobile-menu"
+    class="md:hidden hidden border-b border-f1-border bg-f1-dark/95 backdrop-blur-md"
+    role="dialog"
+    aria-label="Mobile navigation"
+  >
+    <ul class="flex flex-col p-4 gap-1 list-none m-0" role="list">
+      {links.map(({ href, label }) => (
+        <li>
+          <a
+            href={href}
+            class:list={[
+              'flex items-center gap-3 font-heading font-600 text-base tracking-widest uppercase px-4 py-3 transition-colors duration-200 no-underline border-l-2',
+              isActive(href)
+                ? 'text-f1-white border-f1-red bg-f1-red/5'
+                : 'text-f1-grey hover:text-f1-white border-transparent hover:border-f1-border',
+            ]}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<!-- Spacer for fixed nav -->
+<div class="h-[calc(2px+3.5rem)]" aria-hidden="true"></div>
+
+<script>
+  // Mobile toggle
+  const toggle = document.getElementById('nav-toggle');
+  const menu   = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => {
+    const open = menu?.classList.toggle('hidden');
+    toggle.setAttribute('aria-expanded', open === false ? 'true' : 'false');
+  });
+
+  // Scroll: add shadow / bg on scroll
+  const nav = document.getElementById('nav');
+  const onScroll = () => {
+    nav?.classList.toggle('scrolled', window.scrollY > 20);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Close mobile menu on route change (View Transitions)
+  document.addEventListener('astro:after-swap', () => {
+    menu?.classList.add('hidden');
+    toggle?.setAttribute('aria-expanded', 'false');
+  });
+</script>
+
+<style>
+  header.scrolled nav {
+    background-color: rgba(10, 10, 10, 0.98);
+    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.8);
+  }
+</style>

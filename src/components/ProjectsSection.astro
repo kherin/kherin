@@ -1,0 +1,249 @@
+---
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  github: string;
+  live?: string;
+  category: string;
+}
+
+const projects: Project[] = [
+  // Data Science
+  {
+    title: 'GTrail Race Data Scraper',
+    description: 'Scrapes race results from PowerBI-based trail event dashboards and auto-generates styled HTML & WhatsApp-ready PNG team performance reports.',
+    tags: ['Python', 'Playwright', 'Pandas'],
+    github: 'https://github.com/kherin/gtrail_data',
+    category: 'data',
+  },
+  {
+    title: 'Raid West Trail Analysis',
+    description: 'Analyses GPS tracks from Garmin Connect to compare race vs. recon run performance at the 2025 Raid West Trail using gpxpy and Jupyter.',
+    tags: ['Jupyter', 'gpxpy', 'Garmin'],
+    github: 'https://github.com/kherin/raid-west-trail-analysis',
+    category: 'data',
+  },
+  {
+    title: 'Body Language Analysis',
+    description: 'Jupyter notebook leveraging computer vision to detect and classify body language poses and gestures in real time using MediaPipe.',
+    tags: ['OpenCV', 'MediaPipe', 'Jupyter'],
+    github: 'https://github.com/kherin/body-language-analysis',
+    category: 'data',
+  },
+  {
+    title: 'Image Text Extractor',
+    description: 'Comprehensive OCR solution supporting table detection and text extraction with bounding box coordinates from image documents.',
+    tags: ['OCR', 'OpenCV', 'Python'],
+    github: 'https://github.com/kherin/image-text-extractor',
+    category: 'data',
+  },
+  // AI/LLM
+  {
+    title: 'Project Mitosis',
+    description: 'Experimental research into how LLMs can generate code from feature prompts and autonomously integrate it into a running application.',
+    tags: ['LLM', 'JavaScript', 'Vercel'],
+    github: 'https://github.com/kherin/mitosis',
+    live: 'https://mitosis-six.vercel.app',
+    category: 'ai',
+  },
+  {
+    title: 'Papye — OCR Form Filler',
+    description: 'React + Node.js PoC that uses Azure Form Recognizer to scan uploaded images and auto-populate form fields with extracted text.',
+    tags: ['React', 'Node.js', 'Azure'],
+    github: 'https://github.com/kherin/papye',
+    category: 'ai',
+  },
+  // Mobile
+  {
+    title: 'Kondir — Traffic Signs Quiz',
+    description: 'Flutter mobile app helping Mauritians learn traffic signs using incremental machine learning. Cross-platform iOS & Android.',
+    tags: ['Flutter', 'Dart', 'ML'],
+    github: 'https://github.com/kherin/kondir',
+    category: 'mobile',
+  },
+  {
+    title: 'Newscroll — Bite-size News',
+    description: 'Flutter mobile app delivering local and world news in a bite-size swipeable card format covering Mauritius and international headlines.',
+    tags: ['Flutter', 'Dart', 'News API'],
+    github: 'https://github.com/kherin/newscroll',
+    category: 'mobile',
+  },
+  // Web
+  {
+    title: 'Bark & Pop',
+    description: 'NestJS contact form that pipes submissions directly into a Google Sheet — zero database, production-ready.',
+    tags: ['NestJS', 'Google Sheets'],
+    github: 'https://github.com/kherin/bark-and-pop',
+    category: 'web',
+  },
+  {
+    title: 'TechShow Website',
+    description: 'Astro-based website for The TechShow Mauritius Podcast. Fast, static, SEO-optimised.',
+    tags: ['Astro', 'Podcast', 'SEO'],
+    github: 'https://github.com/kherin/techshow-website',
+    category: 'web',
+  },
+  // DevOps
+  {
+    title: 'Semgrep Talk — PYMUG',
+    description: 'Code examples & custom Semgrep rules from the PYMUG talk "Securing React packages with Semgrep". Static analysis for React pitfalls.',
+    tags: ['Semgrep', 'React', 'Security'],
+    github: 'https://github.com/kherin/semgrep-talk',
+    category: 'devops',
+  },
+  {
+    title: 'Post Office — Azure CI/CD',
+    description: 'Tutorial project showcasing integration testing using Postman Collections inside Azure Pipelines — full end-to-end CI/CD automation.',
+    tags: ['Azure Pipelines', 'Postman', 'Node.js'],
+    github: 'https://github.com/kherin/post-office',
+    category: 'devops',
+  },
+];
+
+const categories = [
+  { key: 'all',    label: 'All' },
+  { key: 'data',   label: 'Data Science' },
+  { key: 'ai',     label: 'AI & LLM' },
+  { key: 'mobile', label: 'Mobile' },
+  { key: 'web',    label: 'Web' },
+  { key: 'devops', label: 'DevOps' },
+];
+---
+
+<section id="portfolio" class="py-24 px-6 max-w-6xl mx-auto" aria-labelledby="projects-heading">
+  <div class="reveal">
+    <div class="sector-label mb-3">Race History</div>
+    <h2 id="projects-heading" class="display text-5xl md:text-6xl text-f1-white mb-2">
+      PORT<span class="text-f1-red">FOLIO</span>
+    </h2>
+    <p class="text-f1-grey font-body max-w-xl mb-8">
+      Open-source projects across data science, AI research, mobile, and web — all available on GitHub.
+    </p>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="reveal flex flex-wrap gap-2 mb-10" role="tablist" aria-label="Project categories">
+    {categories.map(({ key, label }) => (
+      <button
+        role="tab"
+        data-filter={key}
+        class:list={[
+          'filter-btn font-heading font-600 text-xs tracking-widest uppercase px-4 py-2 border transition-all duration-200',
+          key === 'all'
+            ? 'border-f1-red text-f1-white bg-f1-red/10'
+            : 'border-f1-border text-f1-grey hover:border-f1-red hover:text-f1-white',
+        ]}
+        aria-selected={key === 'all'}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
+
+  <!-- Grid -->
+  <div id="projects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    {projects.map((project, i) => (
+      <article
+        class="project-card reveal card-carbon p-5 flex flex-col gap-3 cursor-default transition-all duration-300 hover:shadow-card-hover"
+        data-category={project.category}
+        data-delay={i % 3}
+        aria-label={project.title}
+      >
+        <!-- Category badge -->
+        <div class="flex items-start justify-between gap-2">
+          <span class="drs-pill">{project.category.toUpperCase()}</span>
+          <div class="flex gap-2 shrink-0">
+            {project.live && (
+              <a
+                href={project.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Live demo of ${project.title}`}
+                class="text-f1-grey-dark hover:text-f1-red transition-colors duration-200"
+                title="Live Demo"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            )}
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`GitHub repository for ${project.title}`}
+              class="text-f1-grey-dark hover:text-f1-red transition-colors duration-200"
+              title="GitHub"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Title & description -->
+        <div class="flex-1">
+          <h3 class="font-heading font-700 text-base text-f1-white mb-2 leading-snug">
+            {project.title}
+          </h3>
+          <p class="text-f1-grey text-sm leading-relaxed">
+            {project.description}
+          </p>
+        </div>
+
+        <!-- Tech tags -->
+        <div class="flex flex-wrap gap-1.5 pt-1 border-t border-f1-border">
+          {project.tags.map(tag => (
+            <span class="font-mono text-[0.65rem] text-f1-grey-dark bg-f1-dark px-2 py-0.5 border border-f1-border">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <!-- View all CTA -->
+  <div class="reveal mt-10 text-center">
+    <a
+      href="https://github.com/kherin"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="btn-f1 btn-f1-ghost inline-flex items-center gap-2"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      All Repositories on GitHub
+    </a>
+  </div>
+</section>
+
+<script>
+  function initFilter() {
+    const btns  = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const cards = document.querySelectorAll<HTMLElement>('.project-card');
+
+    const filter = (key: string) => {
+      // Update buttons
+      btns.forEach(btn => {
+        const active = btn.dataset.filter === key;
+        btn.classList.toggle('border-f1-red',    active);
+        btn.classList.toggle('text-f1-white',    active);
+        btn.classList.toggle('bg-f1-red/10',     active);
+        btn.classList.toggle('border-f1-border', !active);
+        btn.classList.toggle('text-f1-grey',     !active);
+        btn.setAttribute('aria-selected', String(active));
+      });
+
+      // Show/hide cards
+      cards.forEach(card => {
+        const match = key === 'all' || card.dataset.category === key;
+        card.style.display = match ? '' : 'none';
+      });
+    };
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => filter(btn.dataset.filter ?? 'all'));
+    });
+  }
+
+  initFilter();
+  document.addEventListener('astro:after-swap', initFilter);
+</script>
