@@ -19,45 +19,40 @@ function isActive(href: string): boolean {
   class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
   role="banner"
 >
-  <!-- Racing stripe at very top -->
-  <div class="h-[2px] bg-f1-red w-full"></div>
-
   <nav
-    class="flex items-center justify-between px-6 md:px-10 h-14 bg-f1-black/90 backdrop-blur-md border-b border-f1-border"
+    class="flex items-center justify-between px-6 md:px-10 h-14 bg-night-950/90 backdrop-blur-md border-b border-line"
     aria-label="Main navigation"
   >
-    <!-- Logo -->
+    <!-- Wordmark -->
     <a
       href="/"
-      class="nav-title flex items-center gap-2 group no-underline"
+      class="nav-title flex items-baseline gap-2 group no-underline"
       aria-label="Kherin Bundhoo — Home"
     >
-      <!-- F1-style car number plate -->
       <span
-        class="display text-lg text-f1-white group-hover:text-f1-red transition-colors duration-200 tracking-wider"
-      >KB</span>
-      <span class="hidden sm:block w-px h-5 bg-f1-border"></span>
-      <span
-        class="hidden sm:block font-heading text-sm font-600 text-f1-grey tracking-widest uppercase group-hover:text-f1-white transition-colors duration-200"
+        class="font-display text-lg text-ink group-hover:text-ember transition-colors duration-200"
       >Kherin Bundhoo</span>
+      <span class="hidden sm:block font-mono text-[0.6rem] tracking-[0.25em] uppercase text-ink-faint">
+        AI Engineer
+      </span>
     </a>
 
     <!-- Desktop links -->
     <ul class="hidden md:flex items-center gap-1 list-none m-0 p-0" role="list">
-      {links.map(({ href, label, key }) => (
+      {links.map(({ href, label }) => (
         <li>
           <a
             href={href}
             class:list={[
-              'relative font-heading font-600 text-sm tracking-widest uppercase px-4 py-2 transition-colors duration-200 no-underline group flex flex-col items-center gap-0.5',
-              isActive(href) ? 'text-f1-white' : 'text-f1-grey hover:text-f1-white',
+              'relative font-mono text-xs tracking-[0.18em] uppercase px-4 py-2 transition-colors duration-200 no-underline group flex flex-col items-center gap-0.5',
+              isActive(href) ? 'text-ink' : 'text-ink-dim hover:text-ink',
             ]}
             aria-current={isActive(href) ? 'page' : undefined}
           >
             {label}
             <span
               class:list={[
-                'block h-[2px] w-0 bg-f1-red transition-all duration-300 group-hover:w-full',
+                'block h-px w-0 bg-ember transition-all duration-300 group-hover:w-full',
                 isActive(href) ? 'w-full' : '',
               ]}
             ></span>
@@ -74,16 +69,16 @@ function isActive(href: string): boolean {
       aria-expanded="false"
       aria-controls="mobile-menu"
     >
-      <span class="block w-6 h-[2px] bg-f1-white transition-all duration-300 group-aria-[expanded=true]:rotate-45 group-aria-[expanded=true]:translate-y-[7px]"></span>
-      <span class="block w-6 h-[2px] bg-f1-white transition-opacity duration-300 group-aria-[expanded=true]:opacity-0"></span>
-      <span class="block w-6 h-[2px] bg-f1-white transition-all duration-300 group-aria-[expanded=true]:-rotate-45 group-aria-[expanded=true]:-translate-y-[7px]"></span>
+      <span class="block w-6 h-[2px] bg-ink transition-all duration-300 group-aria-[expanded=true]:rotate-45 group-aria-[expanded=true]:translate-y-[7px]"></span>
+      <span class="block w-6 h-[2px] bg-ink transition-opacity duration-300 group-aria-[expanded=true]:opacity-0"></span>
+      <span class="block w-6 h-[2px] bg-ink transition-all duration-300 group-aria-[expanded=true]:-rotate-45 group-aria-[expanded=true]:-translate-y-[7px]"></span>
     </button>
   </nav>
 
   <!-- Mobile menu -->
   <div
     id="mobile-menu"
-    class="md:hidden hidden border-b border-f1-border bg-f1-dark/95 backdrop-blur-md"
+    class="md:hidden hidden border-b border-line bg-night-900/95 backdrop-blur-md"
     role="dialog"
     aria-label="Mobile navigation"
   >
@@ -93,10 +88,10 @@ function isActive(href: string): boolean {
           <a
             href={href}
             class:list={[
-              'flex items-center gap-3 font-heading font-600 text-base tracking-widest uppercase px-4 py-3 transition-colors duration-200 no-underline border-l-2',
+              'flex items-center gap-3 font-mono text-sm tracking-[0.18em] uppercase px-4 py-3 transition-colors duration-200 no-underline border-l',
               isActive(href)
-                ? 'text-f1-white border-f1-red bg-f1-red/5'
-                : 'text-f1-grey hover:text-f1-white border-transparent hover:border-f1-border',
+                ? 'text-ink border-ember bg-ember/5'
+                : 'text-ink-dim hover:text-ink border-transparent hover:border-line-strong',
             ]}
             aria-current={isActive(href) ? 'page' : undefined}
           >
@@ -109,7 +104,7 @@ function isActive(href: string): boolean {
 </header>
 
 <!-- Spacer for fixed nav -->
-<div class="h-[calc(2px+3.5rem)]" aria-hidden="true"></div>
+<div class="h-14" aria-hidden="true"></div>
 
 <script>
   // Mobile toggle
@@ -136,7 +131,7 @@ function isActive(href: string): boolean {
 
 <style>
   header.scrolled nav {
-    background-color: rgba(10, 10, 10, 0.98);
+    background-color: rgba(11, 11, 13, 0.98);
     box-shadow: 0 2px 24px rgba(0, 0, 0, 0.8);
   }
 </style>

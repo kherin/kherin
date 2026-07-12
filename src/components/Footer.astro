@@ -20,20 +20,14 @@ const socials = [
 ];
 ---
 
-<footer class="border-t border-f1-border bg-f1-dark mt-24" role="contentinfo">
-  <!-- Racing stripe -->
-  <div class="h-[2px] bg-gradient-to-r from-transparent via-f1-red to-transparent"></div>
-
+<footer class="border-t border-line bg-night-900 mt-24" role="contentinfo">
   <div class="max-w-6xl mx-auto px-6 py-12">
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
       <!-- Brand -->
       <div>
-        <div class="display text-3xl text-f1-white mb-1">KHERIN BUNDHOO</div>
-        <p class="font-heading text-sm text-f1-grey tracking-widest uppercase">
-          Full-Stack Developer · Data Scientist · Trail Runner
-        </p>
-        <p class="font-heading text-xs text-f1-grey-dark mt-1 tracking-wider">
-          Mauritius 🇲🇺
+        <div class="font-display text-2xl text-ink mb-1">Kherin Bundhoo</div>
+        <p class="font-mono text-xs text-ink-dim tracking-[0.18em] uppercase">
+          AI Engineer · Trail Runner · Mauritius
         </p>
       </div>
 
@@ -49,7 +43,7 @@ const socials = [
             <li>
               <a
                 href={href}
-                class="font-heading text-sm font-600 text-f1-grey hover:text-f1-red tracking-widest uppercase transition-colors duration-200 no-underline"
+                class="font-mono text-xs text-ink-dim hover:text-ember tracking-[0.18em] uppercase transition-colors duration-200 no-underline"
               >{label}</a>
             </li>
           ))}
@@ -64,7 +58,7 @@ const socials = [
             target="_blank"
             rel="noopener noreferrer"
             aria-label={label}
-            class="w-9 h-9 flex items-center justify-center text-f1-grey hover:text-f1-red border border-f1-border hover:border-f1-red transition-all duration-200"
+            class="w-9 h-9 flex items-center justify-center text-ink-dim hover:text-ember border border-line hover:border-ember-dim transition-all duration-200"
             set:html={icon}
           />
         ))}
@@ -72,12 +66,12 @@ const socials = [
     </div>
 
     <!-- Bottom bar -->
-    <div class="mt-10 pt-6 border-t border-f1-border flex flex-col sm:flex-row items-center justify-between gap-3">
-      <p class="font-mono text-xs text-f1-grey-dark">
-        © {year} Kherin Bundhoo. Built with Astro & Three.js.
+    <div class="mt-10 pt-6 border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="font-mono text-xs text-ink-faint">
+        © {year} Kherin Bundhoo. Built with Astro & Canvas.
       </p>
-      <p class="font-mono text-xs text-f1-grey-dark flex items-center gap-1">
-        <span class="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+      <p class="font-mono text-xs text-ink-faint flex items-center gap-1.5">
+        <span class="inline-block w-2 h-2 rounded-full bg-ember animate-pulse"></span>
         kherin.com
       </p>
     </div>

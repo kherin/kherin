@@ -14,9 +14,6 @@ export default defineConfig({
     keystatic(),
   ],
   vite: {
-    ssr: {
-      noExternal: ['three'],
-    },
     optimizeDeps: {
       exclude: ['@keystatic/core'],
     },

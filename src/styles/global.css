@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Fonts are loaded via <link> in SEO.astro so the stylesheet fetch is not
+   serialized behind this bundled CSS (better FCP/LCP). */
 
 @tailwind base;
 @tailwind components;
@@ -6,31 +7,21 @@
 
 /* ─── CSS Custom Properties ─────────────────────────────────── */
 :root {
-  --f1-red:       #E10600;
-  --f1-red-dark:  #C00000;
-  --f1-black:     #0A0A0A;
-  --f1-dark:      #111111;
-  --f1-card:      #161616;
-  --f1-border:    #1F1F1F;
-  --f1-grey:      #A0A0A0;
-  --f1-white:     #FFFFFF;
-  --transition-f1: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --night-950: #0B0B0D;
+  --night-900: #101013;
+  --night-850: #15151A;
+  --line:        rgba(244, 241, 234, 0.08);
+  --line-strong: rgba(244, 241, 234, 0.16);
+  --ink:       #F4F1EA;
+  --ink-dim:   #9C978C;
+  --ink-faint: #6B675E;
+  --ember:       #F5A623;
+  --ember-hover: #FFC94D;
+  --ember-dim:   #B87A18;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ─── View Transitions ────────────────────────────────────────── */
-/* F1-style horizontal wipe */
-@keyframes vt-slide-out {
-  to {
-    transform: translateX(-100%);
-    clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
-  }
-}
-@keyframes vt-slide-in {
-  from {
-    transform: translateX(100%);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 20% 100%);
-  }
-}
 @keyframes vt-fade-out {
   to { opacity: 0; }
 }
@@ -39,10 +30,10 @@
 }
 
 ::view-transition-old(root) {
-  animation: vt-slide-out 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: vt-fade-out 0.2s ease forwards;
 }
 ::view-transition-new(root) {
-  animation: vt-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: vt-fade-in 0.25s ease forwards;
 }
 
 /* Reduced motion */
@@ -80,210 +71,189 @@ html {
 }
 
 body {
-  background-color: var(--f1-black);
-  color: var(--f1-white);
+  background-color: var(--night-950);
+  color: var(--ink);
   font-family: 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
   line-height: 1.6;
 }
 
 ::selection {
-  background: var(--f1-red);
-  color: #fff;
+  background: var(--ember);
+  color: var(--night-950);
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--f1-dark); }
-::-webkit-scrollbar-thumb { background: var(--f1-red); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #ff2a2a; }
+::-webkit-scrollbar-track { background: var(--night-900); }
+::-webkit-scrollbar-thumb { background: var(--ember-dim); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ember); }
 
 /* ─── Typography ─────────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  line-height: 1.15;
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
 }
 
 .display {
-  font-family: 'Bebas Neue', Impact, sans-serif;
-  letter-spacing: 0.04em;
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+}
+
+/* Shared entrance keyframe (used via arbitrary animate-[...] values) */
+@keyframes fadeUp {
+  0%   { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Kicker (editorial section label) ──────────────────────── */
+.kicker {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+/* Oversized section numeral that often pairs with the kicker */
+.section-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-faint);
   line-height: 1;
 }
 
-/* ─── Section Label (F1 Sector Style) ───────────────────────── */
-.sector-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--f1-red);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.sector-label::before {
-  content: '';
-  display: inline-block;
-  width: 16px;
-  height: 2px;
-  background: var(--f1-red);
-  flex-shrink: 0;
-}
-
-/* ─── Racing Stripe Divider ─────────────────────────────────── */
-.racing-stripe {
+/* ─── Hairline Rule ─────────────────────────────────────────── */
+.rule {
   width: 100%;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--f1-red) 20%,
-    var(--f1-red) 80%,
-    transparent 100%
-  );
-  position: relative;
-}
-.racing-stripe::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: inherit;
-  filter: blur(4px);
-  opacity: 0.5;
+  height: 1px;
+  background: var(--line);
 }
 
-/* ─── Carbon Fibre Card ─────────────────────────────────────── */
-.card-carbon {
-  background-color: var(--f1-card);
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6L6 0L12 6L6 12Z' fill='%23161616' stroke='%231A1A1A' stroke-width='0.5'/%3E%3C/svg%3E");
-  border: 1px solid var(--f1-border);
-  position: relative;
+/* ─── Card (flat + hairline) ────────────────────────────────── */
+.card {
+  background-color: var(--night-900);
+  border: 1px solid var(--line);
+  transition: border-color 0.3s var(--ease-out);
 }
-.card-carbon::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  right: 0; height: 2px;
-  background: var(--f1-red);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--transition-f1);
-}
-.card-carbon:hover::before {
-  transform: scaleX(1);
+.card:hover {
+  border-color: var(--line-strong);
 }
 
-/* ─── Red Accent Button ─────────────────────────────────────── */
-.btn-f1 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.15em;
+/* ─── Buttons ────────────────────────────────────────────────── */
+.btn {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 0.6rem 1.4rem;
-  background: var(--f1-red);
-  color: #fff;
-  border: none;
+  padding: 0.7rem 1.4rem;
+  background: var(--ember);
+  color: var(--night-950);
+  border: 1px solid var(--ember);
   cursor: pointer;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 100%, 8px 100%);
-  transition: background var(--transition-f1), transform var(--transition-f1);
+  transition: background 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
 }
-.btn-f1:hover {
-  background: #ff2a2a;
-  transform: translateX(2px);
+.btn:hover {
+  background: var(--ember-hover);
+  border-color: var(--ember-hover);
 }
-.btn-f1-ghost {
+.btn-ghost {
   background: transparent;
-  border: 1px solid var(--f1-border);
-  color: var(--f1-grey);
-  clip-path: none;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-dim);
 }
-.btn-f1-ghost:hover {
-  border-color: var(--f1-red);
-  color: var(--f1-white);
-  background: rgba(225,6,0,0.08);
-  transform: none;
+.btn-ghost:hover {
+  background: rgba(245, 166, 35, 0.06);
+  border-color: var(--ember-dim);
+  color: var(--ink);
 }
 
-/* ─── Skill / Telemetry Bar ──────────────────────────────────── */
-.telemetry-bar {
-  height: 3px;
-  background: var(--f1-border);
-  position: relative;
-  overflow: hidden;
-}
-.telemetry-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--f1-red-dark), var(--f1-red));
-  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 6px rgba(225, 6, 0, 0.6);
-}
-
-/* ─── DRS Indicator Pill ─────────────────────────────────────── */
-.drs-pill {
-  font-family: 'Barlow Condensed', sans-serif;
+/* ─── Tag ────────────────────────────────────────────────────── */
+.tag {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid var(--f1-red);
-  color: var(--f1-red);
-  background: rgba(225, 6, 0, 0.1);
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  background: transparent;
 }
 
 /* ─── Section Animations ─────────────────────────────────────── */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.6s ease, transform 0.6s var(--ease-out);
 }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
+/* ─── Photo figure ───────────────────────────────────────────── */
+.photo-frame {
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.photo-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-caption {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-top: 0.6rem;
+}
+
 /* ─── Prose (blog content) ───────────────────────────────────── */
 .prose {
-  color: #d1d1d1;
+  color: #CFCBC2;
   max-width: 72ch;
 }
 .prose h1, .prose h2, .prose h3 {
-  color: var(--f1-white);
-  margin-top: 2rem;
+  color: var(--ink);
+  margin-top: 2.25rem;
   margin-bottom: 0.75rem;
 }
 .prose h1 { font-size: 2rem; }
-.prose h2 {
-  font-size: 1.5rem;
-  border-left: 3px solid var(--f1-red);
-  padding-left: 0.75rem;
-}
-.prose h3 { font-size: 1.25rem; color: #e0e0e0; }
+.prose h2 { font-size: 1.6rem; }
+.prose h3 { font-size: 1.2rem; }
 .prose p  { margin-bottom: 1.25rem; }
-.prose a  { color: var(--f1-red); text-decoration: underline; text-underline-offset: 3px; }
-.prose a:hover { color: #ff4444; }
-.prose strong { color: var(--f1-white); font-weight: 600; }
+.prose a  { color: var(--ember); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { color: var(--ember-hover); }
+.prose strong { color: var(--ink); font-weight: 600; }
 .prose code {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.85em;
-  background: #1a1a1a;
-  border: 1px solid var(--f1-border);
+  background: var(--night-850);
+  border: 1px solid var(--line);
   padding: 0.1em 0.4em;
   border-radius: 2px;
-  color: #e0e0e0;
+  color: #E4E1D8;
 }
 .prose pre {
-  background: #111;
-  border: 1px solid var(--f1-border);
-  border-left: 3px solid var(--f1-red);
+  background: var(--night-900);
+  border: 1px solid var(--line);
   padding: 1.25rem;
   overflow-x: auto;
   margin-bottom: 1.5rem;
@@ -296,10 +266,11 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.7;
 }
 .prose blockquote {
-  border-left: 3px solid var(--f1-red);
+  border-left: 2px solid var(--ember-dim);
   padding-left: 1rem;
   margin-left: 0;
-  color: var(--f1-grey);
+  color: var(--ink-dim);
+  font-family: 'Fraunces', Georgia, serif;
   font-style: italic;
 }
 .prose ul  { list-style: none; padding-left: 0; }
@@ -309,8 +280,8 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.4rem;
 }
 .prose ul li::before {
-  content: '▸';
-  color: var(--f1-red);
+  content: '—';
+  color: var(--ember-dim);
   position: absolute;
   left: 0;
 }
@@ -323,48 +294,188 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.9rem;
 }
 .prose th {
-  background: #1a1a1a;
-  color: var(--f1-white);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  color: var(--ink);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   text-align: left;
   padding: 0.5rem 0.75rem;
-  border-bottom: 2px solid var(--f1-red);
+  border-bottom: 1px solid var(--line-strong);
 }
 .prose td {
   padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--f1-border);
+  border-bottom: 1px solid var(--line);
 }
 .prose hr {
   border: none;
   height: 1px;
-  background: var(--f1-border);
+  background: var(--line);
   margin: 2rem 0;
 }
 
-/* ─── Utility ────────────────────────────────────────────────── */
-.text-gradient {
-  background: linear-gradient(135deg, #fff 0%, var(--f1-grey) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ─── Hero: scroll-reactive topographic map ──────────────────── */
+/* 3× viewport of scroll distance drives the altitude sweep up the
+   contour levels. The inner viewport is sticky, so the map stays
+   pinned while the climb plays. */
+.hero-scroll {
+  height: 300vh;
+  height: 300svh;
 }
-.text-red-gradient {
-  background: linear-gradient(135deg, var(--f1-red) 0%, #ff6060 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.hero-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.hero-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+canvas.hero-layer {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.hero-live canvas.hero-layer {
+  opacity: 1;
 }
 
-/* Speed-line background pattern */
-.speed-lines-bg {
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 18px,
-    rgba(255,255,255,0.015) 18px,
-    rgba(255,255,255,0.015) 19px
-  );
+/* Instant-paint ambient before the splat scene is ready:
+   faint headlamp warmth low in the frame, cold moonlight above */
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 72%, rgba(245, 166, 35, 0.07), transparent 70%),
+    radial-gradient(ellipse 50% 32% at 50% 20%, rgba(196, 210, 240, 0.04), transparent 65%);
+}
+
+/* Scroll progress bar — native CSS scroll-driven animation where
+   supported; hero-scene.ts drives transform elsewhere. */
+.hero-progressbar {
+  position: absolute;
+  top: calc(3.5rem + 1px); /* just below the fixed nav */
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 30;
+  background: linear-gradient(90deg, var(--ember-dim), var(--ember));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+@supports (animation-timeline: view()) {
+  .hero-scroll {
+    view-timeline-name: --hero-view;
+    view-timeline-axis: block;
+  }
+  .hero-progressbar {
+    animation: hero-progress 1ms linear both;
+    animation-timeline: --hero-view;
+    animation-range: contain 0% contain 100%;
+  }
+}
+@keyframes hero-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Phase 0 content fades out once the camera journey starts */
+.hero-main {
+  transition: opacity 0.45s ease, transform 0.45s var(--ease-out);
+}
+.hero-scroll:not([data-phase='0']) .hero-main {
+  opacity: 0;
+  transform: translateY(-28px);
+  pointer-events: none;
+}
+.hero-scroll:not([data-phase='0']) .hero-scrollcue {
+  opacity: 0 !important;
+}
+
+/* Captions appear per camera phase */
+.hero-caption {
+  position: absolute;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.5s ease, transform 0.5s var(--ease-out);
+  pointer-events: none;
+  padding: 0 1.5rem;
+  /* keep captions legible over bright splat regions */
+  text-shadow: 0 1px 2px rgba(11, 11, 13, 0.9), 0 0 22px rgba(11, 11, 13, 0.75);
+}
+.hero-caption::before {
+  content: '';
+  position: absolute;
+  inset: -18% -14%;
+  z-index: -1;
+  background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(11, 11, 13, 0.5), transparent 72%);
+}
+.hero-caption-1 { left: 6%; bottom: 16%; }
+.hero-caption-2 { right: 6%; top: 18%; text-align: right; }
+.hero-caption-3 { left: 50%; bottom: 18%; transform: translate(-50%, 28px); text-align: center; width: 100%; }
+[data-phase='1'] .hero-caption-1 { opacity: 1; transform: translateY(0); }
+[data-phase='2'] .hero-caption-2 { opacity: 1; transform: translateY(0); }
+[data-phase='3'] .hero-caption-3 { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 640px) {
+  .hero-caption-1 { left: 0; bottom: 20%; }
+  .hero-caption-2 { right: 0; top: 22%; }
+}
+
+/* Fallback: no canvas context → static single-viewport hero, CSS ambient only */
+.hero-scroll.hero-flat {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+.hero-flat .hero-sticky {
+  position: relative;
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+.hero-flat canvas.hero-layer,
+.hero-flat .hero-caption,
+.hero-flat .hero-progressbar {
+  display: none;
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* static hero: no scroll journey, one rendered frame, captions off */
+  .hero-scroll {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .hero-sticky {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .hero-caption,
+  .hero-progressbar {
+    display: none;
+  }
+  canvas.hero-layer {
+    opacity: 1;
+  }
 }

@@ -39,26 +39,26 @@ const related = allPosts
 
   {related.length > 0 && (
     <div class="mt-16">
-      <div class="racing-stripe mb-8" aria-hidden="true"></div>
-      <h2 class="font-heading font-700 text-lg text-f1-white mb-5 tracking-wider uppercase">Related Posts</h2>
+      <div class="rule mb-8" aria-hidden="true"></div>
+      <h2 class="font-mono text-sm text-ink-dim mb-5 tracking-[0.18em] uppercase">Related posts</h2>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {related.map(p => (
           <a
             href={`/blog/${p.slug}`}
-            class="card-carbon p-4 flex flex-col gap-2 no-underline group"
+            class="card p-4 flex flex-col gap-2 no-underline group"
             aria-label={p.data.title}
           >
             {p.data.tags && p.data.tags.length > 0 && (
               <div class="flex flex-wrap gap-1">
                 {p.data.tags.slice(0, 2).map(t => (
-                  <span class="font-mono text-[0.6rem] text-f1-grey-dark">{t}</span>
+                  <span class="font-mono text-[0.6rem] text-ink-faint tracking-wider uppercase">{t}</span>
                 ))}
               </div>
             )}
-            <p class="font-heading font-700 text-sm text-f1-white group-hover:text-f1-red transition-colors duration-200 leading-snug">
+            <p class="font-display text-sm text-ink group-hover:text-ember transition-colors duration-200 leading-snug">
               {p.data.title}
             </p>
-            <time datetime={p.data.publishedAt} class="font-mono text-[0.65rem] text-f1-grey-dark mt-auto">
+            <time datetime={p.data.publishedAt} class="font-mono text-[0.65rem] text-ink-faint mt-auto">
               {new Date(p.data.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
             </time>
           </a>

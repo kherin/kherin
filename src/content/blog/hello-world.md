@@ -8,6 +8,8 @@ draft: false
 
 # Hello World
 
+> *Editor's note (July 2026): this post describes the site's original F1-themed build. The design has since been replaced by the current night-ridge editorial look — but the Astro, CMS, and Docker foundations below are still what's running.*
+
 Welcome to **kherin.com** — my corner of the internet where I write about code, data science, trail running, and whatever else keeps me up at night.
 
 ## Why Astro?

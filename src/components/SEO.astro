@@ -54,7 +54,7 @@ const jsonLd = type === 'article'
       '@type': 'Person',
       name: 'Kherin Bundhoo',
       url: siteUrl,
-      jobTitle: ['Full-Stack Developer', 'Data Scientist', 'Mobile Developer'],
+      jobTitle: ['AI Engineer', 'Data Scientist', 'Full-Stack Developer'],
       description,
       image: imageUrl,
       sameAs: [
@@ -62,18 +62,18 @@ const jsonLd = type === 'article'
         'https://www.kaggle.com/kherin',
         'https://www.datacamp.com/portfolio/kherin',
       ],
-      knowsAbout: ['Python', 'TypeScript', 'React', 'Data Science', 'Machine Learning', 'Flutter', 'Docker'],
+      knowsAbout: ['Large Language Models', 'AI Engineering', 'Python', 'TypeScript', 'React', 'Data Science', 'Machine Learning', 'Flutter', 'Docker'],
       address: { '@type': 'PostalAddress', addressCountry: 'MU' },
     };
 ---
 
 <title>{fullTitle}</title>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="description" content={description} />
 <meta name="author" content="Kherin Bundhoo" />
 <meta name="robots" content="index, follow" />
-<meta name="theme-color" content="#0A0A0A" />
+<meta name="theme-color" content="#0B0B0D" />
 <link rel="canonical" href={canonicalUrl} />
 
 <!-- Open Graph -->
@@ -98,9 +98,14 @@ const jsonLd = type === 'article'
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="manifest" href="/site.webmanifest" />
 
-<!-- Preconnect for Google Fonts -->
+<!-- Fonts: loaded here (not via CSS @import) so the request starts with the
+     document instead of being serialized behind the bundled stylesheet -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+/>
 
 <!-- JSON-LD Structured Data -->
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
