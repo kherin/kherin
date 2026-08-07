@@ -3,10 +3,17 @@ export const prerender = false;
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
 
+type SitemapPage = {
+  url: string;
+  priority: string;
+  changefreq: string;
+  lastmod?: string;
+};
+
 export const GET: APIRoute = async () => {
   const siteUrl = 'https://kherin.com';
 
-  const staticPages = [
+  const staticPages: SitemapPage[] = [
     { url: `${siteUrl}/`,          priority: '1.0', changefreq: 'weekly' },
     { url: `${siteUrl}/about`,     priority: '0.8', changefreq: 'monthly' },
     { url: `${siteUrl}/portfolio`, priority: '0.9', changefreq: 'monthly' },
@@ -14,8 +21,8 @@ export const GET: APIRoute = async () => {
   ];
 
   const posts = await getCollection('blog', ({ data }) => !data.draft);
-  const blogPages = posts.map(post => ({
-    url: `${siteUrl}/blog/${post.slug}`,
+  const blogPages: SitemapPage[] = posts.map(post => ({
+    url: `${siteUrl}/blog/${post.id}`,
     priority: '0.7',
     changefreq: 'monthly',
     lastmod: post.data.publishedAt,

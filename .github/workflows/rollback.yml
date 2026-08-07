@@ -1,0 +1,54 @@
+name: Roll back production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Roll back to the last successfully deployed digest
+        required: true
+        type: choice
+        options:
+          - rollback-previous
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: kherin-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Restore the previous healthy slot
+    if: inputs.confirm == 'rollback-previous' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: Production
+    steps:
+      - name: Assert the rollback context
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" != workflow_dispatch || "${GITHUB_REF}" != refs/heads/main ]]; then
+            printf 'Refusing rollback for event=%s ref=%s\n' \
+              "${GITHUB_EVENT_NAME}" "${GITHUB_REF}" >&2
+            exit 1
+          fi
+
+      - name: Join the deployment tailnet with GitHub OIDC
+        uses: tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888 # v4.1.3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_AUDIENCE }}
+          tags: tag:ci-kherin
+          ping: ${{ vars.TS_DEPLOY_HOST }}
+
+      - name: Restore previous slot
+        env:
+          TS_DEPLOY_HOST: ${{ vars.TS_DEPLOY_HOST }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${TS_DEPLOY_HOST}"
+          tailscale ssh "deploy-kherin@${TS_DEPLOY_HOST}" rollback

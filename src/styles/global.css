@@ -1,9 +1,25 @@
 /* Fonts are loaded via <link> in SEO.astro so the stylesheet fetch is not
    serialized behind this bundled CSS (better FCP/LCP). */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-night-950: #0B0B0D;
+  --color-night-900: #101013;
+  --color-night-850: #15151A;
+  --color-ink: #F4F1EA;
+  --color-ink-dim: #9C978C;
+  --color-ink-faint: #6B675E;
+  --color-ember: #F5A623;
+  --color-ember-hover: #FFC94D;
+  --color-ember-dim: #B87A18;
+  --color-line: rgba(244, 241, 234, 0.08);
+  --color-line-strong: rgba(244, 241, 234, 0.16);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 /* ─── CSS Custom Properties ─────────────────────────────────── */
 :root {

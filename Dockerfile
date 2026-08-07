@@ -1,40 +1,49 @@
-# ─── Stage 1: Build ──────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+# syntax=docker/dockerfile:1.7
+
+ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
+
+# Keep the tag human-readable and the digest immutable. Dependabot updates both.
+FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS builder
+
+ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
+ENV PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}
 
 WORKDIR /app
 
-# Install deps first (layer-cached if package.json unchanged)
 COPY package*.json ./
-RUN npm ci --ignore-scripts
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --ignore-scripts
 
-# Copy source
 COPY . .
 
-# Build Astro (outputs to dist/)
-RUN npm run build
+RUN case "${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}" in \
+      ''|*[!a-z0-9-]*|-*|*-) echo 'PUBLIC_KEYSTATIC_GITHUB_APP_SLUG must be a lowercase GitHub App slug' >&2; exit 1 ;; \
+    esac \
+    && npm run build \
+    && npm prune --omit=dev --ignore-scripts \
+    && npm cache clean --force
 
-# ─── Stage 2: Production ────────────────────────────────────────────────────
-FROM node:20-alpine AS production
+FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS production
+
+ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 
 WORKDIR /app
 
-# Only bring in what's needed to run
-COPY --from=builder /app/dist             ./dist
-COPY --from=builder /app/node_modules     ./node_modules
-COPY --from=builder /app/package.json     ./
-# Content dir so the CMS can read/write blog posts at runtime
-COPY --from=builder /app/src/content      ./src/content
+COPY --chown=node:node --from=builder /app/dist ./dist
+COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/package.json ./package.json
 
-# Runtime environment
-ENV HOST=0.0.0.0
-ENV PORT=4321
-ENV NODE_ENV=production
+ENV HOST=0.0.0.0 \
+    PORT=4321 \
+    NODE_ENV=production \
+    PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}
 
 EXPOSE 4321
+STOPSIGNAL SIGTERM
 
-# Health-check so docker-compose / orchestrators can monitor
-# 127.0.0.1, not localhost: alpine resolves localhost to ::1 first, but node binds IPv4-only
+USER node
+
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:4321/ || exit 1
+  CMD ["node", "-e", "fetch('http://127.0.0.1:4321/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
 
 CMD ["node", "./dist/server/entry.mjs"]

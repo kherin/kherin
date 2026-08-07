@@ -41,7 +41,7 @@ const posts = allPosts
               aria-label={post.data.title}
             >
               <a
-                href={`/blog/${post.slug}`}
+                href={`/blog/${post.id}`}
                 class="grid grid-cols-1 md:grid-cols-[10rem_1fr_auto] items-baseline gap-2 md:gap-8 py-7 no-underline"
               >
                 <time datetime={post.data.publishedAt} class="font-mono text-xs text-ink-faint tracking-wider">

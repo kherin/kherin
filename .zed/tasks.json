@@ -1,0 +1,44 @@
+[
+  {
+    "label": "bootstrap: npm ci",
+    "command": "/usr/local/bin/dev-heavy",
+    "args": ["npm", "ci"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "dev: tmux on localhost:4323",
+    "command": "tmux",
+    "args": [
+      "new-session",
+      "-A",
+      "-s",
+      "kherin-dev",
+      "npm run dev -- --host 127.0.0.1 --port 4323"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "check: Astro",
+    "command": "/usr/local/bin/dev-heavy",
+    "args": ["npm", "run", "check"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "build: production",
+    "command": "/usr/local/bin/dev-heavy",
+    "args": ["npm", "run", "build"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  }
+]

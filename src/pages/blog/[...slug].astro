@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import BlogPostLayout from '../../layouts/BlogPostLayout.astro';
 
 const { slug } = Astro.params;
@@ -14,16 +14,16 @@ if (!post || post.data.draft) {
   return Astro.redirect('/blog', 302);
 }
 
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 // Estimate reading time
-const words = post.body.trim().split(/\s+/).length;
+const words = (post.body ?? '').trim().split(/\s+/).length;
 const readingTime = Math.ceil(words / 200);
 
 // Fetch related posts (same tags, excluding current)
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
 const related = allPosts
-  .filter(p => p.slug !== post.slug && p.data.tags?.some(t => post.data.tags?.includes(t)))
+  .filter(p => p.id !== post.id && p.data.tags?.some(t => post.data.tags?.includes(t)))
   .slice(0, 3);
 ---
 
@@ -44,7 +44,7 @@ const related = allPosts
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {related.map(p => (
           <a
-            href={`/blog/${p.slug}`}
+            href={`/blog/${p.id}`}
             class="card p-4 flex flex-col gap-2 no-underline group"
             aria-label={p.data.title}
           >
