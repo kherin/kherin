@@ -58,10 +58,13 @@ root filesystem and no content volume.
 
 A successful `CI` run for a trusted push to `main` starts `Release`:
 
-1. Check out the exact validated commit.
-2. Push `ghcr.io/kherin/kherin:sha-<full-commit-sha>`.
+1. Require the validated SHA to be the exact current remote `main`, then check
+   out that commit. This rejects late completion or reruns of superseded CI.
+2. Push `ghcr.io/kherin/kherin:sha-<full-commit-sha>` with exact OCI source and
+   revision labels.
 3. Generate and verify GitHub provenance for the registry digest.
-4. Join Tailscale through GitHub OIDC as the ephemeral `tag:ci-kherin` node.
+4. Recheck remote `main`, then join Tailscale through GitHub OIDC as the
+   ephemeral `tag:ci-kherin` node.
 5. Send only `deploy sha256:<64 lowercase hex characters>` to
    `deploy-kherin` on the VPS, with the workflow actor and short-lived GitHub
    token as two newline-delimited stdin fields for a private GHCR pull.

@@ -40,6 +40,22 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.workflow_run.head_sha }}
 
+      - name: Assert the validated commit is current main
+        env:
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${VALIDATED_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          read -r current_main current_ref extra \
+            < <(git ls-remote --exit-code --refs origin refs/heads/main)
+          [[ "${current_ref}" == refs/heads/main && -z "${extra:-}" ]]
+          if [[ "${current_main}" != "${VALIDATED_SHA}" ]]; then
+            printf 'Refusing stale release: validated=%s current-main=%s\n' \
+              "${VALIDATED_SHA}" "${current_main}" >&2
+            exit 1
+          fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
@@ -57,6 +73,9 @@ jobs:
           build-args: |
             PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${{ vars.PUBLIC_KEYSTATIC_GITHUB_APP_SLUG }}
           context: .
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
           platforms: linux/amd64
           provenance: false
           push: true
@@ -78,6 +97,22 @@ jobs:
           set -euo pipefail
           [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
           gh attestation verify "oci://${IMAGE_NAME}@${IMAGE_DIGEST}" --repo "${GITHUB_REPOSITORY}"
+
+      - name: Recheck current main before deployment
+        env:
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${VALIDATED_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          read -r current_main current_ref extra \
+            < <(git ls-remote --exit-code --refs origin refs/heads/main)
+          [[ "${current_ref}" == refs/heads/main && -z "${extra:-}" ]]
+          if [[ "${current_main}" != "${VALIDATED_SHA}" ]]; then
+            printf 'Refusing superseded release: validated=%s current-main=%s\n' \
+              "${VALIDATED_SHA}" "${current_main}" >&2
+            exit 1
+          fi
 
       - name: Join the deployment tailnet with GitHub OIDC
         uses: tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888 # v4.1.3
