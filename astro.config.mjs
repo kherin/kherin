@@ -19,6 +19,9 @@ if (isBuild && !githubAppSlugPattern.test(githubAppSlug ?? '')) {
 
 export default defineConfig({
   site: 'https://kherin.com',
+  security: {
+    allowedDomains: [{ hostname: 'kherin.com', protocol: 'https' }],
+  },
   adapter: node({ mode: 'standalone' }),
   integrations: [react(), keystatic()],
   vite: {
