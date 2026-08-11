@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kherin-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 22.23.2
+  PUBLIC_KEYSTATIC_GITHUB_APP_SLUG: ${{ vars.PUBLIC_KEYSTATIC_GITHUB_APP_SLUG }}
+
+jobs:
+  validate:
+    name: Validate application
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate public Keystatic build input
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]
+
+      - name: Run Astro checks
+        run: npm run check
+
+      - name: Build application
+        run: npm run build
+
+  container:
+    name: Build and smoke-test container
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      - name: Build local test image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          build-args: |
+            PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${{ vars.PUBLIC_KEYSTATIC_GITHUB_APP_SLUG }}
+          context: .
+          load: true
+          platforms: linux/amd64
+          provenance: false
+          push: false
+          tags: kherin-ci:${{ github.sha }}
+
+      - name: Verify read-only production container
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          container_id=$(docker run --detach \
+            --read-only \
+            --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777 \
+            --cap-drop ALL \
+            --security-opt no-new-privileges:true \
+            --pids-limit 128 \
+            --memory 512m \
+            --cpus 0.75 \
+            --env KEYSTATIC_GITHUB_CLIENT_ID=test-client \
+            --env KEYSTATIC_GITHUB_CLIENT_SECRET=test-client-secret \
+            --env KEYSTATIC_SECRET=0123456789abcdef0123456789abcdef \
+            --publish 127.0.0.1:4321:4321 \
+            "kherin-ci:${GITHUB_SHA}")
+
+          # shellcheck disable=SC2329  # Invoked through the EXIT trap.
+          cleanup_container() {
+            docker rm --force "${container_id}" >/dev/null 2>&1 || true
+          }
+          trap cleanup_container EXIT
+
+          for _ in $(seq 1 45); do
+            health=$(docker inspect --format '{{.State.Health.Status}}' "${container_id}")
+            if [[ "${health}" == "healthy" ]]; then
+              test "$(curl --fail --silent --show-error http://127.0.0.1:4321/healthz)" = "ok"
+              curl --fail --silent --show-error --output /dev/null http://127.0.0.1:4321/
+
+              login_headers=$(mktemp)
+              curl --silent --show-error --output /dev/null --dump-header "${login_headers}" \
+                'http://127.0.0.1:4321/api/keystatic/github/login?from=branch%2Fmain%2Fcollection%2Fblog'
+              test "$(awk 'NR == 1 { print $2 }' "${login_headers}")" = "307"
+              awk '
+                BEGIN { IGNORECASE = 1 }
+                /^set-cookie:/ {
+                  cookie_count++
+                  if ($0 !~ /;[[:space:]]*Secure(;|\r?$)/) insecure_count++
+                }
+                END { exit !(cookie_count == 1 && insecure_count == 0) }
+              ' "${login_headers}"
+              exit 0
+            fi
+
+            state=$(docker inspect --format '{{.State.Status}}' "${container_id}")
+            if [[ "${health}" == "unhealthy" || "${state}" == "exited" ]]; then
+              docker logs "${container_id}"
+              exit 1
+            fi
+
+            sleep 1
+          done
+
+          docker logs "${container_id}"
+          exit 1
