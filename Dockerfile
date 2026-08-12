@@ -32,6 +32,8 @@ WORKDIR /app
 COPY --chown=node:node --from=builder /app/dist ./dist
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
 COPY --chown=node:node --from=builder /app/package.json ./package.json
+COPY --chown=node:node --from=builder /app/src/content/blog ./src/content/blog
+COPY --chown=node:node --from=builder /app/public/images/blog ./public/images/blog
 
 ENV HOST=0.0.0.0 \
     PORT=4321 \
