@@ -70,21 +70,38 @@ jobs:
         id: existing-image
         env:
           GH_TOKEN: ${{ github.token }}
+          GHCR_PASSWORD: ${{ github.token }}
+          GHCR_USERNAME: ${{ github.actor }}
           VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
         run: |
           set -euo pipefail
           [[ "${VALIDATED_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          image_tag="${IMAGE_NAME}:sha-${VALIDATED_SHA}"
-          if digest_json=$(docker buildx imagetools inspect "${image_tag}" \
-            --format '{{json .Manifest.Digest}}' 2>&1); then
-            digest=$(jq -er \
-              'select(type == "string" and test("^sha256:[0-9a-f]{64}$"))' \
-              <<<"${digest_json}") || {
+          repository=${IMAGE_NAME#ghcr.io/}
+          image_tag="sha-${VALIDATED_SHA}"
+          registry_token=$(curl --fail --silent --show-error \
+            --user "${GHCR_USERNAME}:${GHCR_PASSWORD}" \
+            --get https://ghcr.io/token \
+            --data-urlencode service=ghcr.io \
+            --data-urlencode "scope=repository:${repository}:pull" \
+            | jq -er '.token | select(type == "string" and length > 0)')
+          response_headers=$(mktemp)
+          response_body=$(mktemp)
+          trap 'rm -f "${response_headers}" "${response_body}"' EXIT
+          status=$(curl --silent --show-error \
+            --output "${response_body}" \
+            --dump-header "${response_headers}" \
+            --write-out '%{http_code}' \
+            --header "Authorization: Bearer ${registry_token}" \
+            --header 'Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
+            "https://ghcr.io/v2/${repository}/manifests/${image_tag}")
+          if [[ "${status}" == 200 ]]; then
+            digest=$(awk 'BEGIN { IGNORECASE=1 } /^Docker-Content-Digest:/ { gsub("\\r", "", $2); print $2 }' \
+              "${response_headers}")
+            [[ "${digest}" =~ ^sha256:[0-9a-f]{64}$ ]] || {
               printf 'The existing commit tag returned an invalid manifest digest.\n' >&2
               exit 1
             }
-            [[ "${digest}" =~ ^sha256:[0-9a-f]{64}$ ]]
             gh attestation verify "oci://${IMAGE_NAME}@${digest}" \
               --repo "${GITHUB_REPOSITORY}" \
               --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/release.yml" \
@@ -93,16 +110,15 @@ jobs:
             printf 'digest=%s\n' "${digest}" >>"${GITHUB_OUTPUT}"
             printf 'exists=true\n' >>"${GITHUB_OUTPUT}"
             printf 'Reusing immutable commit image %s@%s.\n' "${IMAGE_NAME}" "${digest}"
+          elif [[ "${status}" == 404 ]] &&
+            jq -e 'any(.errors[]?; .code == "MANIFEST_UNKNOWN")' "${response_body}" >/dev/null; then
+            printf 'exists=false\n' >>"${GITHUB_OUTPUT}"
+            printf 'No image exists for %s; a new immutable image will be built.\n' \
+              "${VALIDATED_SHA}"
           else
-            if grep -Eiq '(^|[^0-9])404([^0-9]|$)|manifest unknown|manifest[[:space:]]+unknown' \
-              <<<"${digest_json}"; then
-              printf 'exists=false\n' >>"${GITHUB_OUTPUT}"
-              printf 'No image exists for %s; a new immutable image will be built.\n' \
-                "${VALIDATED_SHA}"
-            else
-              printf 'Failed to resolve the immutable commit image; refusing to build over an ambiguous tag state.\n' >&2
-              exit 1
-            fi
+            printf 'Failed to resolve the immutable commit image (HTTP %s); refusing to build over an ambiguous tag state.\n' \
+              "${status}" >&2
+            exit 1
           fi
 
       - name: Build and publish immutable image
@@ -131,6 +147,8 @@ jobs:
       - name: Publish the immutable commit tag
         if: steps.existing-image.outputs.exists == 'false'
         env:
+          GHCR_PASSWORD: ${{ github.token }}
+          GHCR_USERNAME: ${{ github.actor }}
           IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
           VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
@@ -141,22 +159,37 @@ jobs:
             exit 1
           fi
           [[ "${VALIDATED_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          image_tag="${IMAGE_NAME}:sha-${VALIDATED_SHA}"
-          if race_output=$(docker buildx imagetools inspect "${image_tag}" \
-            --format '{{json .Manifest.Digest}}' 2>&1); then
+          repository=${IMAGE_NAME#ghcr.io/}
+          image_tag="sha-${VALIDATED_SHA}"
+          registry_token=$(curl --fail --silent --show-error \
+            --user "${GHCR_USERNAME}:${GHCR_PASSWORD}" \
+            --get https://ghcr.io/token \
+            --data-urlencode service=ghcr.io \
+            --data-urlencode "scope=repository:${repository}:pull" \
+            | jq -er '.token | select(type == "string" and length > 0)')
+          response_body=$(mktemp)
+          trap 'rm -f "${response_body}"' EXIT
+          status=$(curl --silent --show-error \
+            --output "${response_body}" \
+            --write-out '%{http_code}' \
+            --header "Authorization: Bearer ${registry_token}" \
+            --header 'Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
+            "https://ghcr.io/v2/${repository}/manifests/${image_tag}")
+          if [[ "${status}" == 200 ]]; then
             printf 'The immutable commit tag appeared during the build; refusing to move it.\n' >&2
             exit 1
           fi
-          if ! grep -Eiq '(^|[^0-9])404([^0-9]|$)|manifest unknown|manifest[[:space:]]+unknown' \
-            <<<"${race_output}"; then
-            printf 'The immutable commit tag could not be rechecked unambiguously; refusing to publish it.\n' >&2
+          if [[ "${status}" != 404 ]] ||
+            ! jq -e 'any(.errors[]?; .code == "MANIFEST_UNKNOWN")' "${response_body}" >/dev/null; then
+            printf 'The immutable commit tag could not be rechecked unambiguously (HTTP %s); refusing to publish it.\n' \
+              "${status}" >&2
             exit 1
           fi
           docker buildx imagetools create \
             --prefer-index=false \
-            --tag "${image_tag}" \
+            --tag "${IMAGE_NAME}:${image_tag}" \
             "${IMAGE_NAME}@${IMAGE_DIGEST}"
-          published_digest=$(docker buildx imagetools inspect "${image_tag}" \
+          published_digest=$(docker buildx imagetools inspect "${IMAGE_NAME}:${image_tag}" \
             --format '{{json .Manifest.Digest}}' \
             | jq -er 'select(type == "string" and test("^sha256:[0-9a-f]{64}$"))')
           [[ "${published_digest}" == "${IMAGE_DIGEST}" ]]
