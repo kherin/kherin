@@ -106,6 +106,15 @@ jobs:
               test "$(curl --fail --silent --show-error http://127.0.0.1:4321/healthz)" = "ok"
               curl --fail --silent --show-error --output /dev/null http://127.0.0.1:4321/
 
+              test "$(docker exec "${container_id}" sha256sum \
+                /app/src/content/blog/cms-persistence-acceptance-20260812.mdoc \
+                | awk '{ print $1 }')" = \
+                "9fa00de3e72eecc72eb314924e67d92de6b6fd7c0708ab673e5192ef8b67826c"
+              test "$(docker exec "${container_id}" sha256sum \
+                /app/public/images/blog/cms-persistence-acceptance-20260812/image.png \
+                | awk '{ print $1 }')" = \
+                "6885f88466039283fad8a95cc25cb1cea523ded0c0103dfcaf026d4d9788f670"
+
               login_headers=$(mktemp)
               curl --silent --show-error --output /dev/null --dump-header "${login_headers}" \
                 'http://127.0.0.1:4321/api/keystatic/github/login?from=branch%2Fmain%2Fcollection%2Fblog'
