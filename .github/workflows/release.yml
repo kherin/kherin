@@ -93,7 +93,7 @@ jobs:
             --dump-header "${response_headers}" \
             --write-out '%{http_code}' \
             --header "Authorization: Bearer ${registry_token}" \
-            --header 'Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
+            --header 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
             "https://ghcr.io/v2/${repository}/manifests/${image_tag}")
           if [[ "${status}" == 200 ]]; then
             digest=$(awk 'BEGIN { IGNORECASE=1 } /^Docker-Content-Digest:/ { gsub("\\r", "", $2); print $2 }' \
@@ -111,7 +111,10 @@ jobs:
             printf 'exists=true\n' >>"${GITHUB_OUTPUT}"
             printf 'Reusing immutable commit image %s@%s.\n' "${IMAGE_NAME}" "${digest}"
           elif [[ "${status}" == 404 ]] &&
-            jq -e 'any(.errors[]?; .code == "MANIFEST_UNKNOWN")' "${response_body}" >/dev/null; then
+            jq -e 'any(.errors[]?;
+              .code == "MANIFEST_UNKNOWN"
+              and ((.message // "") | ascii_downcase) == "manifest unknown"
+            )' "${response_body}" >/dev/null; then
             printf 'exists=false\n' >>"${GITHUB_OUTPUT}"
             printf 'No image exists for %s; a new immutable image will be built.\n' \
               "${VALIDATED_SHA}"
@@ -173,14 +176,17 @@ jobs:
             --output "${response_body}" \
             --write-out '%{http_code}' \
             --header "Authorization: Bearer ${registry_token}" \
-            --header 'Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
+            --header 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
             "https://ghcr.io/v2/${repository}/manifests/${image_tag}")
           if [[ "${status}" == 200 ]]; then
             printf 'The immutable commit tag appeared during the build; refusing to move it.\n' >&2
             exit 1
           fi
           if [[ "${status}" != 404 ]] ||
-            ! jq -e 'any(.errors[]?; .code == "MANIFEST_UNKNOWN")' "${response_body}" >/dev/null; then
+            ! jq -e 'any(.errors[]?;
+              .code == "MANIFEST_UNKNOWN"
+              and ((.message // "") | ascii_downcase) == "manifest unknown"
+            )' "${response_body}" >/dev/null; then
             printf 'The immutable commit tag could not be rechecked unambiguously (HTTP %s); refusing to publish it.\n' \
               "${status}" >&2
             exit 1
