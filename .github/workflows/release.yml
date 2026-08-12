@@ -94,7 +94,7 @@ jobs:
             printf 'exists=true\n' >>"${GITHUB_OUTPUT}"
             printf 'Reusing immutable commit image %s@%s.\n' "${IMAGE_NAME}" "${digest}"
           else
-            if grep -Eiq '(^|[^0-9])404([^0-9]|$)|manifest unknown|not found' \
+            if grep -Eiq '(^|[^0-9])404([^0-9]|$)|manifest unknown|manifest[[:space:]]+unknown' \
               <<<"${digest_json}"; then
               printf 'exists=false\n' >>"${GITHUB_OUTPUT}"
               printf 'No image exists for %s; a new immutable image will be built.\n' \
@@ -142,8 +142,14 @@ jobs:
           fi
           [[ "${VALIDATED_SHA}" =~ ^[0-9a-f]{40}$ ]]
           image_tag="${IMAGE_NAME}:sha-${VALIDATED_SHA}"
-          if docker buildx imagetools inspect "${image_tag}" >/dev/null 2>&1; then
+          if race_output=$(docker buildx imagetools inspect "${image_tag}" \
+            --format '{{json .Manifest.Digest}}' 2>&1); then
             printf 'The immutable commit tag appeared during the build; refusing to move it.\n' >&2
+            exit 1
+          fi
+          if ! grep -Eiq '(^|[^0-9])404([^0-9]|$)|manifest unknown|manifest[[:space:]]+unknown' \
+            <<<"${race_output}"; then
+            printf 'The immutable commit tag could not be rechecked unambiguously; refusing to publish it.\n' >&2
             exit 1
           fi
           docker buildx imagetools create \
