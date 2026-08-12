@@ -66,7 +66,47 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
 
+      - name: Resolve an existing immutable commit image
+        id: existing-image
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${VALIDATED_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          image_tag="${IMAGE_NAME}:sha-${VALIDATED_SHA}"
+          if digest_json=$(docker buildx imagetools inspect "${image_tag}" \
+            --format '{{json .Manifest.Digest}}' 2>&1); then
+            digest=$(jq -er \
+              'select(type == "string" and test("^sha256:[0-9a-f]{64}$"))' \
+              <<<"${digest_json}") || {
+              printf 'The existing commit tag returned an invalid manifest digest.\n' >&2
+              exit 1
+            }
+            [[ "${digest}" =~ ^sha256:[0-9a-f]{64}$ ]]
+            gh attestation verify "oci://${IMAGE_NAME}@${digest}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/release.yml" \
+              --source-ref refs/heads/main \
+              --source-digest "${VALIDATED_SHA}"
+            printf 'digest=%s\n' "${digest}" >>"${GITHUB_OUTPUT}"
+            printf 'exists=true\n' >>"${GITHUB_OUTPUT}"
+            printf 'Reusing immutable commit image %s@%s.\n' "${IMAGE_NAME}" "${digest}"
+          else
+            if grep -Eiq '(^|[^0-9])404([^0-9]|$)|manifest unknown|not found' \
+              <<<"${digest_json}"; then
+              printf 'exists=false\n' >>"${GITHUB_OUTPUT}"
+              printf 'No image exists for %s; a new immutable image will be built.\n' \
+                "${VALIDATED_SHA}"
+            else
+              printf 'Failed to resolve the immutable commit image; refusing to build over an ambiguous tag state.\n' >&2
+              exit 1
+            fi
+          fi
+
       - name: Build and publish immutable image
+        if: steps.existing-image.outputs.exists == 'false'
         id: image
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
@@ -76,27 +116,66 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
+          outputs: type=registry,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true
           platforms: linux/amd64
           provenance: false
-          push: true
-          tags: ${{ env.IMAGE_NAME }}:sha-${{ github.event.workflow_run.head_sha }}
 
       - name: Attest image provenance
+        if: steps.existing-image.outputs.exists == 'false'
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           subject-name: ${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.image.outputs.digest }}
           push-to-registry: true
 
-      - name: Verify digest and provenance
+      - name: Publish the immutable commit tag
+        if: steps.existing-image.outputs.exists == 'false'
         env:
-          GH_TOKEN: ${{ github.token }}
           IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
         run: |
           set -euo pipefail
-          [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
-          gh attestation verify "oci://${IMAGE_NAME}@${IMAGE_DIGEST}" --repo "${GITHUB_REPOSITORY}"
+          if [[ ! "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            printf 'The build did not produce a valid canonical digest.\n' >&2
+            exit 1
+          fi
+          [[ "${VALIDATED_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          image_tag="${IMAGE_NAME}:sha-${VALIDATED_SHA}"
+          if docker buildx imagetools inspect "${image_tag}" >/dev/null 2>&1; then
+            printf 'The immutable commit tag appeared during the build; refusing to move it.\n' >&2
+            exit 1
+          fi
+          docker buildx imagetools create \
+            --prefer-index=false \
+            --tag "${image_tag}" \
+            "${IMAGE_NAME}@${IMAGE_DIGEST}"
+          published_digest=$(docker buildx imagetools inspect "${image_tag}" \
+            --format '{{json .Manifest.Digest}}' \
+            | jq -er 'select(type == "string" and test("^sha256:[0-9a-f]{64}$"))')
+          [[ "${published_digest}" == "${IMAGE_DIGEST}" ]]
+
+      - name: Verify digest and provenance
+        id: release-image
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILT_DIGEST: ${{ steps.image.outputs.digest }}
+          EXISTING_DIGEST: ${{ steps.existing-image.outputs.digest }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE_DIGEST=${EXISTING_DIGEST:-${BUILT_DIGEST:-}}
+          if [[ ! "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            printf 'No valid release image digest was selected.\n' >&2
+            exit 1
+          fi
+          gh attestation verify "oci://${IMAGE_NAME}@${IMAGE_DIGEST}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/release.yml" \
+            --source-ref refs/heads/main \
+            --source-digest "${VALIDATED_SHA}"
+          printf 'digest=%s\n' "${IMAGE_DIGEST}" >>"${GITHUB_OUTPUT}"
 
       - name: Recheck current main before deployment
         env:
@@ -126,12 +205,15 @@ jobs:
         env:
           GHCR_TOKEN: ${{ github.token }}
           GHCR_USERNAME: ${{ github.actor }}
-          IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
+          IMAGE_DIGEST: ${{ steps.release-image.outputs.digest }}
           TS_DEPLOY_HOST: ${{ vars.TS_DEPLOY_HOST }}
         shell: bash
         run: |
           set -euo pipefail
-          [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
+          if [[ ! "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            printf 'No valid release image digest was verified.\n' >&2
+            exit 1
+          fi
           test -n "${TS_DEPLOY_HOST}"
           printf '%s\n%s\n' "${GHCR_USERNAME}" "${GHCR_TOKEN}" \
             | tailscale ssh "deploy-kherin@${TS_DEPLOY_HOST}" "deploy ${IMAGE_DIGEST}"

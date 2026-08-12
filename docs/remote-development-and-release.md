@@ -60,9 +60,14 @@ A successful `CI` run for a trusted push to `main` starts `Release`:
 
 1. Require the validated SHA to be the exact current remote `main`, then check
    out that commit. This rejects late completion or reruns of superseded CI.
-2. Push `ghcr.io/kherin/kherin:sha-<full-commit-sha>` with exact OCI source and
-   revision labels.
-3. Generate and verify GitHub provenance for the registry digest.
+2. Resolve `ghcr.io/kherin/kherin:sha-<full-commit-sha>` first. If it already
+   exists, require valid GitHub provenance from this release workflow for the
+   exact commit and reuse its digest. Otherwise, build and push it once with
+   exact OCI source and revision labels under its canonical digest, attest it,
+   then create the commit tag only after a final absence check. A rerun must
+   never move the commit tag.
+3. Generate provenance for a newly published digest, then verify provenance for
+   the exact digest selected in either path.
 4. Recheck remote `main`, then join Tailscale through GitHub OIDC as the
    ephemeral `tag:ci-kherin` node.
 5. Send only `deploy sha256:<64 lowercase hex characters>` to
