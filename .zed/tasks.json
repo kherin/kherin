@@ -2,7 +2,7 @@
   {
     "label": "bootstrap: npm ci",
     "command": "/usr/local/bin/dev-heavy",
-    "args": ["mise", "exec", "--", "npm", "ci"],
+    "args": ["/home/dev/.local/bin/mise", "exec", "--", "npm", "ci"],
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
@@ -16,7 +16,7 @@
       "-A",
       "-s",
       "kherin-dev",
-      "mise exec -- npm run dev -- --host 127.0.0.1 --port 4323"
+      "/home/dev/.local/bin/mise exec -- npm run dev -- --host 127.0.0.1 --port 4323"
     ],
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": true,
@@ -26,7 +26,7 @@
   {
     "label": "check: Astro",
     "command": "/usr/local/bin/dev-heavy",
-    "args": ["mise", "exec", "--", "npm", "run", "check"],
+    "args": ["/home/dev/.local/bin/mise", "exec", "--", "npm", "run", "check"],
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
@@ -35,7 +35,7 @@
   {
     "label": "build: production",
     "command": "/usr/local/bin/dev-heavy",
-    "args": ["mise", "exec", "--", "npm", "run", "build"],
+    "args": ["/home/dev/.local/bin/mise", "exec", "--", "npm", "run", "build"],
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
