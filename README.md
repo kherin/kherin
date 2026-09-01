@@ -179,7 +179,25 @@ class KherinBundhoo:
 
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td width="33%" valign="top">
+      <h3 align="center">🌾 KaroGuard — Offline Cyclone-Resilience Assistant</h3>
+      <div align="center">
+        <a href="https://github.com/kherin/karoguard-adtc-2026-submission">
+          <img src="https://img.shields.io/badge/kherin%2Fkaroguard--adtc--2026--submission-%230d1117?style=for-the-badge&logo=github&logoColor=white" alt="karoguard-adtc-2026-submission"/>
+        </a>
+        <br/>
+        <img src="https://img.shields.io/github/last-commit/kherin/karoguard-adtc-2026-submission?style=flat-square&color=4ade80&label=last+commit"/>
+        <img src="https://img.shields.io/github/languages/top/kherin/karoguard-adtc-2026-submission?style=flat-square"/>
+        <br/><br/>
+        <p>
+          <img src="https://img.shields.io/badge/Qwen3--4B-5C5CFF?style=flat-square"/>
+          <img src="https://img.shields.io/badge/llama.cpp-GGUF-111111?style=flat-square"/>
+          <img src="https://img.shields.io/badge/Offline%20AI-4CAF50?style=flat-square"/>
+        </p>
+        <p>Compact offline agricultural decision-support model for smallholder farmers in Mauritius and other cyclone-exposed African and Indian Ocean communities. Runs locally through llama.cpp after download. <a href="https://karoguard.kherin.com">Live demo ↗</a></p>
+      </div>
+    </td>
+    <td width="33%" valign="top">
       <h3 align="center">🦠 Project Mitosis</h3>
       <div align="center">
         <a href="https://github.com/kherin/mitosis">
@@ -197,7 +215,7 @@ class KherinBundhoo:
         <p>Highly experimental research project investigating how LLMs can generate code from feature prompts and autonomously integrate it into a running app. <a href="https://mitosis-six.vercel.app">Live demo ↗</a></p>
       </div>
     </td>
-    <td width="50%" valign="top">
+    <td width="33%" valign="top">
       <h3 align="center">🖼️ Papye — OCR Form Filler</h3>
       <div align="center">
         <a href="https://github.com/kherin/papye">
