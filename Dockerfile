@@ -3,7 +3,7 @@
 ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 
 # Keep the tag human-readable and the digest immutable. Dependabot updates both.
-FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS builder
+FROM node:26.9.0-alpine3.23@sha256:9dac39bfd053b458593c44a099d2667994c8fa9e1a8c10bc7ff2f3d97b62412d AS builder
 
 ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 ENV PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}
@@ -23,7 +23,7 @@ RUN case "${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}" in \
     && npm prune --omit=dev --ignore-scripts \
     && npm cache clean --force
 
-FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS production
+FROM node:26.9.0-alpine3.23@sha256:9dac39bfd053b458593c44a099d2667994c8fa9e1a8c10bc7ff2f3d97b62412d AS production
 
 ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 
