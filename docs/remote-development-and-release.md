@@ -17,33 +17,6 @@ and the restricted deployment wrapper are provisioned separately on the VPS.
 
 The development account does not need Docker or production-file access.
 
-## Keystatic GitHub mode
-
-`keystatic.config.ts` stores content in `kherin/kherin`. The production runtime
-requires the documented Keystatic GitHub App variables:
-
-```dotenv
-KEYSTATIC_GITHUB_CLIENT_ID=
-KEYSTATIC_GITHUB_CLIENT_SECRET=
-KEYSTATIC_SECRET=
-PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=
-```
-
-`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, and
-`KEYSTATIC_SECRET` are root-owned runtime credentials. The app slug is public,
-required at build time, and embedded into the generated Keystatic client. Pass
-it as the Docker build argument of the same name; never pass the other three
-credentials to Docker builds.
-
-The current Keystatic Astro adapter does not preserve the upstream cookie
-`Secure` option. Production middleware restores it for the Keystatic API before
-Astro serializes cookies, and the container smoke test verifies both the OAuth
-redirect and its `Set-Cookie` header.
-
-The GitHub App must be installed only on `kherin/kherin`, with the callback URLs
-required by Keystatic for `https://kherin.com`. Repository write access is the
-CMS authorization boundary; the retired site-wide CMS password is not used.
-
 Before enabling the new image in production, compare the old Docker
 `blog_content` volume with `src/content/blog` and commit any drift. The image
 contains the committed content and does not mount a writable content volume.
@@ -82,7 +55,6 @@ repository:
 | Secret   | `TS_OAUTH_CLIENT_ID`               | Tailscale federated identity client ID       |
 | Secret   | `TS_AUDIENCE`                      | Tailscale federated identity audience        |
 | Variable | `TS_DEPLOY_HOST`                   | VPS MagicDNS name or Tailscale IP            |
-| Variable | `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` | Required public Keystatic Docker build input |
 
 Both deployment workflows use the exact GitHub environment name `Production`.
 Create the Tailscale workload identity with GitHub's OIDC issuer,
@@ -117,7 +89,7 @@ confirmation and invokes only `rollback`; callers cannot select an arbitrary
 image or run a shell command. The release and rollback workflows share one
 non-cancelling production concurrency group.
 
-Runtime Keystatic variables remain in a root-owned VPS env file. GHCR pull
+GHCR pull
 credentials and the blue/green Compose definitions also remain on the host. The
 repository's `docker-compose.yml` is a hardened local/reference definition; it
 no longer owns Dozzle or persistent content.

@@ -36,3 +36,5 @@ Thumbs.db
 nginx/ssl/
 nginx/letsencrypt/
 blog-content/
+.vercel
+.env*

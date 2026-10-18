@@ -4,17 +4,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        PUBLIC_KEYSTATIC_GITHUB_APP_SLUG: ${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG:?required at build time}
     restart: unless-stopped
     environment:
       HOST: 0.0.0.0
       PORT: 4321
       NODE_ENV: production
-      KEYSTATIC_GITHUB_CLIENT_ID: ${KEYSTATIC_GITHUB_CLIENT_ID:-}
-      KEYSTATIC_GITHUB_CLIENT_SECRET: ${KEYSTATIC_GITHUB_CLIENT_SECRET:-}
-      KEYSTATIC_SECRET: ${KEYSTATIC_SECRET:-}
-      PUBLIC_KEYSTATIC_GITHUB_APP_SLUG: ${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG:?required at build time}
     ports:
       - "127.0.0.1:${KHERIN_HOST_PORT:-4321}:4321"
     read_only: true

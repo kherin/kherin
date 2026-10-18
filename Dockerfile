@@ -1,12 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
-ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
-
 # Keep the tag human-readable and the digest immutable. Dependabot updates both.
 FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS builder
-
-ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
-ENV PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}
 
 WORKDIR /app
 
@@ -16,16 +11,11 @@ RUN --mount=type=cache,target=/root/.npm \
 
 COPY . .
 
-RUN case "${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}" in \
-      ''|*[!a-z0-9-]*|-*|*-) echo 'PUBLIC_KEYSTATIC_GITHUB_APP_SLUG must be a lowercase GitHub App slug' >&2; exit 1 ;; \
-    esac \
-    && npm run build \
+RUN npm run build \
     && npm prune --omit=dev --ignore-scripts \
     && npm cache clean --force
 
 FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS production
-
-ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 
 WORKDIR /app
 
@@ -33,12 +23,10 @@ COPY --chown=node:node --from=builder /app/dist ./dist
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
 COPY --chown=node:node --from=builder /app/package.json ./package.json
 COPY --chown=node:node --from=builder /app/src/content/blog ./src/content/blog
-COPY --chown=node:node --from=builder /app/public/images/blog ./public/images/blog
 
 ENV HOST=0.0.0.0 \
     PORT=4321 \
-    NODE_ENV=production \
-    PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${PUBLIC_KEYSTATIC_GITHUB_APP_SLUG}
+    NODE_ENV=production
 
 EXPOSE 4321
 STOPSIGNAL SIGTERM

@@ -1,9 +1,5 @@
 User-agent: *
 Allow: /
 
-# Disallow CMS admin panel
-Disallow: /keystatic
-Disallow: /api/keystatic
-
 # Sitemap location
 Sitemap: https://kherin.com/sitemap.xml
