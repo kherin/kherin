@@ -32,9 +32,7 @@ Thumbs.db
 # Astro
 .astro/
 
-# Docker runtime data
-nginx/ssl/
-nginx/letsencrypt/
-blog-content/
+# Vercel
 .vercel
 .env*
+!.env.example

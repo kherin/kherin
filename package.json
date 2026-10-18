@@ -8,7 +8,6 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "start": "node ./dist/server/entry.mjs",
     "build": "astro build",
     "check": "astro check",
     "preview": "astro preview",
