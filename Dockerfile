@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Keep the tag human-readable and the digest immutable. Dependabot updates both.
-FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS builder
+FROM node:26.12.0-alpine3.23@sha256:2ae3a23c9c5d2129398f4844c7c43400c061faf6973852f0fa837323bff9a5a8 AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npm run build \
     && npm prune --omit=dev --ignore-scripts \
     && npm cache clean --force
 
-FROM node:22.23.2-alpine3.23@sha256:46825fbbd4e996a78b7a2cdc08d75e38a5a505bdab95dcda55605359bf124bc6 AS production
+FROM node:26.12.0-alpine3.23@sha256:2ae3a23c9c5d2129398f4844c7c43400c061faf6973852f0fa837323bff9a5a8 AS production
 
 WORKDIR /app
 
